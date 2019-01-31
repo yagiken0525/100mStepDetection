@@ -3,7 +3,7 @@
 //
 
 #include "panorama.h"
-#include "basicFunction/basicFunction.h"
+#include "basicFunctions/basicFunction.h"
 #include <opencv2/xfeatures2d.hpp>
 
 using namespace std;
@@ -74,7 +74,7 @@ void Panorama::selectMaskArea() {
     cv::Scalar color(0, 255, 0);
     bool finish_masking = false;
 
-    string file_name = "../images/" + this->_video_name + "/maskArea.txt";
+    string file_name = _txt_folder + "/maskArea.txt";
 
     //テキストファイルからマスク領域を入力
     if (this->USE_LASTMASK){

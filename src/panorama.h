@@ -16,24 +16,16 @@ namespace yagi {
 
     class Panorama {
 
-    private:
-        // フォルダパス
-        std::string _image_folder = "../images/";
-        std::string _originalVideo_folder = "../originalVideos/";
-        std::string _trimmedVideo_folder = "../videos/";
-        std::string _plotData_folder = "../plotData/";
-
-        // ファイルパス
-        std::string _imagelist_name = "/imagelist.txt";
-        std::string _poselist_name = "/human_pose_info.txt";
-
-        // 変数名
-        std::string _video_name;
-        std::string _image_txt_path;
-        std::string _human_area_list;
-
-
     public:
+        std::string _video_name;
+        std::string _project_path;
+        std::string _image_folder;
+        std::string _result_folder;
+        std::string _video_folder;
+        std::string _txt_folder;
+        std::string _image_list_path;
+        std::string _openpose_list_path;
+
 
         int MASK_MARGIN;
         int MAX_TRANSLATION;
@@ -57,9 +49,9 @@ namespace yagi {
         bool REMOVE_OTHER_RUNNERS;
         std::string VIRTUAL_TARGET_VIDEO;
 
-        Panorama() {};
+        Panorama(std::string video_name);
 
-        ~Panorama() {};
+        ~Panorama(){};
 
         //変数格納
         void setVariables(std::string video_name);
@@ -191,6 +183,7 @@ namespace yagi {
         bool SELECT_TARGET_RANE;
         int IMG_WIDTH;
         int IMG_HEIGHT;
+        std::string videoType;
         //
         std::vector<std::string> img_names;
 

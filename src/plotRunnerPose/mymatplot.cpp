@@ -5,7 +5,7 @@
 #include<iostream>
 #include <fstream>
 #include "mymatplot.h"
-#include "../basicFunction/basicFunction.h"
+#include "../basicFunctions/basicFunction.h"
 #include "matplotlib.h"
 #include <assert.h>
 

@@ -3,7 +3,7 @@
 //
 
 #include "RANSAC.h"
-#include "../basicFunction/basicFunction.h"
+#include "../basicFunctions/basicFunction.h"
 #include <fstream>
 
 //#define N 7      // データ数

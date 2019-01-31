@@ -7,9 +7,10 @@
 
 //#include <openpose/flags.hpp>
 // OpenPose dependencies
+#include <sys/stat.h>
 #include <openpose/headers.hpp>
 
 namespace yagi{
-    void outputTextFromVideo(const std::string folder_path, const std::string video_path, const std::string output_path);
+    void outputTextFromVideo(const std::string video_path, const std::string image_output_path, const std::string txt_output_path);
 };
 #endif //RUNNERSTEPS_MYOPENPOSE_H

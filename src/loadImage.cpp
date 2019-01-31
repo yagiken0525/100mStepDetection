@@ -3,71 +3,15 @@
 //
 
 #include "panorama.h"
-#include "basicFunction/basicFunction.h"
+#include "basicFunctions/basicFunction.h"
 
 using namespace yagi;
 using namespace std;
 
-//
-//void display(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
-//{
-//    // User's displaying/saving/other processing here
-//    // datum.cvOutputData: rendered frame with pose or heatmaps
-//    // datum.poseKeypoints: Array<float> with the estimated pose
-//    if (datumsPtr != nullptr && !datumsPtr->empty())
-//    {
-//        // Display image
-//        cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
-//        cv::waitKey(1);
-//    }
-//    else
-//        op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
-//}
-//
-//void printKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
-//{
-//    // Example: How to use the pose keypoints
-//    if (datumsPtr != nullptr && !datumsPtr->empty())
-//    {
-//        // Alternative 1
-//        op::log("Body keypoints: " + datumsPtr->at(0).poseKeypoints.toString());
-//
-//        // // Alternative 2
-//        // op::log(datumsPtr->at(0).poseKeypoints);
-//
-//        // // Alternative 3
-//        // std::cout << datumsPtr->at(0).poseKeypoints << std::endl;
-//
-//        // // Alternative 4 - Accesing each element of the keypoints
-//        // op::log("\nKeypoints:");
-//        // const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
-//        // op::log("Person pose keypoints:");
-//        // for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)
-//        // {
-//        //     op::log("Person " + std::to_string(person) + " (x, y, score):");
-//        //     for (auto bodyPart = 0 ; bodyPart < poseKeypoints.getSize(1) ; bodyPart++)
-//        //     {
-//        //         std::string valueToPrint;
-//        //         for (auto xyscore = 0 ; xyscore < poseKeypoints.getSize(2) ; xyscore++)
-//        //             valueToPrint += std::to_string(   poseKeypoints[{person, bodyPart, xyscore}]   ) + " ";
-//        //         op::log(valueToPrint);
-//        //     }
-//        // }
-//        // op::log(" ");
-//    }
-//    else
-//        op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
-//}
-/**
- * @fn
- * 画像の読み込みを行う
- * @brief 画像の読み込みを行う
- * @param (show_image) 読み込んだ画像を表示
- */
 void Panorama::loadImage() {
 
     //画像リストopen
-    ifstream ifs(_image_txt_path);
+    ifstream ifs(_image_list_path);
 
     //imshowうまくいかない時用
     string line;
@@ -80,13 +24,13 @@ void Panorama::loadImage() {
     // cv::namedWindow("image", CV_WINDOW_NORMAL);
     while (getline(ifs, line)) {
 
-        //imshowがうまくいかないときここ原因(下4行をコメントアウト)
-        if(this->_video_name == "kiryu998" || this->_video_name == "Rio100m" || this->_video_name == "100mT42") {
-            if (string_size == 0 || (string_size + 1) == line.size()) {
-                line.erase(line.size() - 1);
-            }
-            string_size = line.size();
-        }
+//        //imshowがうまくいかないときここ原因(下4行をコメントアウト)
+//        if(this->_video_name == "kiryu998" || this->_video_name == "2016_Rio" || this->_video_name == "100mT42") {
+//            if (string_size == 0 || (string_size + 1) == line.size()) {
+//                line.erase(line.size() - 1);
+//            }
+//            string_size = line.size();
+//        }
 
         //ImageInfoに画像を格納していく
         Panorama::ImageInfo image_info;

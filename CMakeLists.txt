@@ -43,7 +43,7 @@ include_directories(${OpenPose_INCLUDE_DIRS} ${GFLAGS_INCLUDE_DIR} ${GLOG_INCLUD
 add_subdirectory(src)
 add_subdirectory(src/videoToImage)
 add_subdirectory(src/plotRunnerPose)
-add_subdirectory(src/basicFunction)
+add_subdirectory(src/basicFunctions)
 add_subdirectory(src/complimentFootprints)
 add_subdirectory(src/openpose)
 # add_subdirectory(src/HasegawaSan)

@@ -3,7 +3,7 @@
 //
 
 #include "panorama.h"
-#include "basicFunction/basicFunction.h"
+#include "basicFunctions/basicFunction.h"
 #include "calcLiniorEquation.h"
 
 using namespace std;
@@ -62,7 +62,7 @@ void Panorama::selectTrack() {
     cv::imshow(window_name, first_image);
 
     //クリック点ファイル名前
-    string click_file_name = "../images/" + this->_video_name + "/trackLineDetection.txt";
+    string click_file_name = _txt_folder + "/trackLineDetection.txt";
 
     //クリックするためのループ
     if (this->USE_LAST_TRACKLINE == false) {

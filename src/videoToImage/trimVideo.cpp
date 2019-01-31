@@ -5,7 +5,7 @@
 #include "trimVideo.h"
 #include <sys/stat.h>
 #include <string>
-#include "../basicFunction/basicFunction.h"
+#include "../basicFunctions/basicFunction.h"
 using namespace std;
 
 /**
@@ -19,7 +19,7 @@ using namespace std;
 namespace videoToImage {
 
 //ビデオのトリミング
-    void trimVideo(string video_name, string input_path, string output_path, string imagelist_name, string video_type) {
+    void trimVideo(string video_name, string input_path, string output_path, string imagelist_path, string video_type) {
 
         //入力動画名
         string video_path = input_path + video_name + video_type;
@@ -31,7 +31,7 @@ namespace videoToImage {
         cv::Mat img;
 
         //画像保存先の確保
-        string image_folder(output_path + video_name);
+        string image_folder(output_path);
         cout << "output images directory: " << output_path << endl;
 
         //ディレクトリ作成
@@ -58,7 +58,6 @@ namespace videoToImage {
         int frame_counter = 0;
 
         //テキストファイルオープン
-        string imagelist_path = output_path + video_name + imagelist_name;
         cout << "imageList " << imagelist_path << endl;
         ofstream outputfile(imagelist_path);
 

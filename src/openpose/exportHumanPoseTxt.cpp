@@ -8,7 +8,7 @@
 #define OPENPOSE_FLAGS_DISABLE_POSE
 
 #include "myOpenPose.h"
-#include "../../src/basicFunction/basicFunction.h"
+#include "../../src/basicFunctions/basicFunction.h"
 #include<iostream>
 #include<fstream>
 
@@ -72,7 +72,7 @@ void printKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
         op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
 }
 
-void yagi::outputTextFromVideo(const std::string folder_path, const std::string video_path, const std::string output_path){
+void yagi::outputTextFromVideo(const std::string video_path, const std::string image_output_path, const std::string txt_output_path){
 
     Mat img;
     VideoCapture cap(video_path); //Windowsの場合　パス中の¥は重ねて¥¥とする
@@ -81,12 +81,20 @@ void yagi::outputTextFromVideo(const std::string folder_path, const std::string 
 
     opWrapper.start();
 
-    ofstream outputfile(output_path + "human_pose_info.txt");
-    ofstream imageoutputfile(output_path + "imagelist.txt");
+    ofstream outputfile(txt_output_path + "human_pose_info.txt");
+    ofstream imageoutputfile(txt_output_path + "op_imagelist.txt");
+
+    //ディレクトリ作成
+    const char *cstr = image_output_path.c_str();
+    if (mkdir(cstr, 0777) == 0) {
+        printf("directory correctly generated\n");
+    } else {
+        printf("directory already exists\n");
+    }
 
     // Process and display image
     int max_frame=cap.get(CV_CAP_PROP_FRAME_COUNT); //フレーム数
-    for(int i=0; i<max_frame;i++){ cap>>img ; //1フレーム分取り出してimgに保持させる
+    for(int i=0; i<max_frame;i++){ ; //1フレーム分取り出してimgに保持させる
         cap>>img ; //1フレーム分取り出してimgに保持させる
         cv::resize(img,img,Size(), 640.0/img.cols, 320.0/img.rows);
 
@@ -121,8 +129,8 @@ void yagi::outputTextFromVideo(const std::string folder_path, const std::string 
                 op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
 
             display(datumProcessed);
-            cv::imwrite(folder_path + yagi::digitString(i, 4) + ".jpg", datumProcessed->at(0).cvOutputData);
-            imageoutputfile << folder_path + yagi::digitString(i,4) + ".jpg" << endl;
+            cv::imwrite(image_output_path + yagi::digitString(i, 4) + ".jpg", datumProcessed->at(0).cvOutputData);
+            imageoutputfile << image_output_path + yagi::digitString(i,4) + ".jpg" << endl;
         }
         else
             op::log("Image could not be processed.", op::Priority::High);

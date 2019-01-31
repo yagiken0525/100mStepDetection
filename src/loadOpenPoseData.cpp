@@ -3,7 +3,7 @@
 //
 
 #include "panorama.h"
-#include "basicFunction/basicFunction.h"
+#include "basicFunctions/basicFunction.h"
 #include <opencv2/xfeatures2d.hpp>
 
 using namespace std;
@@ -13,7 +13,7 @@ using namespace cv;
 //OpenPoseのデータ読みこみ
 void Panorama::detectHumanArea() {
     cout << "[Detect human area]" << endl;
-    ifstream ifs(_human_area_list);
+    ifstream ifs(_openpose_list_path);
     string line;
     OpenPoseBody runner;
     vector<OpenPoseBody> runners;

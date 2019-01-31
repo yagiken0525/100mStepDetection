@@ -1,7 +1,7 @@
 #include "panorama.h"
 #include <opencv2/xfeatures2d.hpp>
 #include "plotRunnerPose/mymatplot.h"
-#include "basicFunction/basicFunction.h"
+#include "basicFunctions/basicFunction.h"
 #include "virtualRace.h"
 #include "nDegreeApproximation.h"
 
@@ -10,6 +10,22 @@ using namespace std;
 using namespace yagi;
 using namespace cv;
 
+Panorama::Panorama(string video_name) {
+    _video_name = video_name;
+    _project_path = "../projects/" + video_name + "/";
+    _image_folder = _project_path + "/images/";
+    _result_folder = _project_path + "/results/";
+    _video_folder = "../videos/";
+    _txt_folder = _project_path + "/texts/";
+    _openpose_list_path = _txt_folder + "/human_pose_info.txt";
+    _image_list_path = _txt_folder + "/imagelist.txt";
+
+    //ディレクトリ作成
+    myMkdir(_project_path);
+    myMkdir(_image_folder);
+    myMkdir(_result_folder);
+    myMkdir(_txt_folder);
+}
 
 //グローバル変数
 struct mouseParam {
@@ -18,14 +34,14 @@ struct mouseParam {
 };
 
 cv::Point2f point;
-bool clicked = false;
+bool myclicked = false;
 
 //変数格納
-void Panorama::setVariables(string video_name) {
-    _video_name = video_name;
-    _image_txt_path = _image_folder + _video_name + _imagelist_name;
-    _human_area_list = _image_folder + _video_name + _poselist_name;
-}
+//void Panorama::setVariables(string video_name) {
+//    _video_name = video_name;
+//    _image_list_path = _image_folder + _video_name + _imagelist_name;
+//    _openpose_list_path = _image_folder + _video_name + _poselist_name;
+//}
 
 
 //ビデオのトリミング
@@ -33,11 +49,7 @@ void Panorama::videotoImage() {
 
     namespace vti = videoToImage;
 
-    //����g���~���O
-    vti::trimVideo(_video_name, _originalVideo_folder, _image_folder, _imagelist_name, ".MTS"
-            ""
-            ""
-            "");
+    vti::trimVideo(_video_name, _video_folder, _image_folder, _image_list_path, videoType);
 
 }
 
@@ -255,7 +267,7 @@ void Panorama::generatePanorama() {
     cv::Mat panorama(PanoramaImage, rect);
 
     //画面に表示できるようにリサイズ
-    cv::imwrite("../panoramaImage/" + this->_video_name + ".jpg", panorama);
+//    cv::imwrite(_result_folder + "panorama.jpg", panorama);
     this->OriginalPanorama = panorama.clone();
 
     this->Panorama_width = panorama.cols;
@@ -268,7 +280,7 @@ void Panorama::generatePanorama() {
 
     cv::imshow("panorama", this->smallPanoramaImage);
     cv::waitKey();
-    cv::imwrite("../images/" + this->_video_name + "/result/panorama.jpg", this->smallPanoramaImage);
+    cv::imwrite(_result_folder + "/panorama.jpg", this->smallPanoramaImage);
 
     cv::destroyAllWindows();
 
@@ -2440,8 +2452,8 @@ cv::Mat getResizeHomography(cv::Size panorama, cv::Size smallPanorama){
 void Panorama::makeVirtualRaceImages(){
     virtualRace src;
     virtualRace tar;
-    src.readSavedData(this->_video_name);
-    tar.readSavedData(VIRTUAL_TARGET_VIDEO);
+    src.readSavedData(_txt_folder + "/virtualRaceData.txt");
+    tar.readSavedData("../projects/" + VIRTUAL_TARGET_VIDEO + "/texts/virtualRaceData.txt");
     tar.loadImages(VIRTUAL_TARGET_VIDEO);
 
     //パノラマresize分のH求める
@@ -2543,7 +2555,7 @@ void Panorama::makeVirtualRaceImages(){
 
 void Panorama::saveData(){
     int frame_num = 0;
-    ofstream outputfile("../images/" + this->_video_name + "/savedData.txt");
+    ofstream outputfile(_txt_folder + "/virtualRaceData.txt");
     outputfile << "Corner_points_panorama: ";
     for(cv::Point2f pt: this->startLineCornerPoints){
         outputfile << pt.x << " " << pt.y << " ";

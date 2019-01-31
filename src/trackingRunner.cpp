@@ -8,7 +8,7 @@
 
 #include "panorama.h"
 #include <opencv2/xfeatures2d.hpp>
-#include "basicFunction/basicFunction.h"
+#include "basicFunctions/basicFunction.h"
 
 
 using namespace std;

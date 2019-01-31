@@ -3,7 +3,7 @@
 //
 
 #include "./panorama.h"
-#include "basicFunction/basicFunction.h"
+#include "basicFunctions/basicFunction.h"
 
 using namespace yagi;
 using namespace std;

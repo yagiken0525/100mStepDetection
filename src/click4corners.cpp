@@ -4,7 +4,7 @@
 
 #include "panorama.h"
 #include <opencv2/xfeatures2d.hpp>
-#include "basicFunction/basicFunction.h"
+#include "basicFunctions/basicFunction.h"
 
 
 using namespace std;
@@ -17,16 +17,16 @@ struct mouseParam {
     int y;
 };
 bool clicked_4corners = false;
-cv::Point2f clicked_point;
+cv::Point2f myclicked_point;
 
 
 //コールバック関数
-void runnerCallBackFunc(int eventType, int x, int y, int flags, void *userdata) {
+void myrunnerCallBackFunc(int eventType, int x, int y, int flags, void *userdata) {
     switch (eventType) {
         case cv::EVENT_LBUTTONUP:
             std::cout << x << " , " << y << std::endl;
-            clicked_point.x = x;
-            clicked_point.y = y;
+            myclicked_point.x = x;
+            myclicked_point.y = y;
             clicked_4corners = true;
 
     }
@@ -39,13 +39,13 @@ void Panorama::startFinishLineSelect() {
 
     vector<cv::Scalar> colors;
     setColor(&colors);
-    string file_name = "../images/" + this->_video_name + "/startFinishLine.txt";
+    string file_name = _txt_folder + "/startFinishLine.txt";
 
     //最初のフレームでスタートラインクリック
     mouseParam mouseEvent;
     string windowName = "click start line (Q: finish clicking)";
     cv::namedWindow(windowName, CV_WINDOW_AUTOSIZE);
-    cv::setMouseCallback(windowName, runnerCallBackFunc, &mouseEvent);
+    cv::setMouseCallback(windowName, myrunnerCallBackFunc, &mouseEvent);
     cv::Mat image = imList[0].image.clone();
 
     if (!USE_LAST_CORNERS) {
@@ -56,8 +56,8 @@ void Panorama::startFinishLineSelect() {
             if (clicked_4corners) {
                 //click point格納
                 clicked_4corners = false;
-                cv::circle(image, clicked_point, 2, colors[0], 2);
-                cv::Point2f pt(clicked_point.x, clicked_point.y);
+                cv::circle(image, myclicked_point, 2, colors[0], 2);
+                cv::Point2f pt(myclicked_point.x, myclicked_point.y);
                 this->startLineCornerPoints.push_back(pt);
             }
 
@@ -70,7 +70,7 @@ void Panorama::startFinishLineSelect() {
 
         windowName = "click finish line(Q: finish clicking, B: back to previous frame)";
         cv::namedWindow(windowName, CV_WINDOW_AUTOSIZE);
-        cv::setMouseCallback(windowName, runnerCallBackFunc, &mouseEvent);
+        cv::setMouseCallback(windowName, myrunnerCallBackFunc, &mouseEvent);
         bool lineSelected = false;
 
         for (int i = imList.size() - 2; i > 0; i--) {
@@ -83,8 +83,8 @@ void Panorama::startFinishLineSelect() {
                 if (clicked_4corners) {
                     //click point格納
                     clicked_4corners = false;
-                    cv::circle(lastImage, clicked_point, 2, colors[0], 2);
-                    cv::Point2f pt(clicked_point.x, clicked_point.y);
+                    cv::circle(lastImage, myclicked_point, 2, colors[0], 2);
+                    cv::Point2f pt(myclicked_point.x, myclicked_point.y);
                     this->finishLineCornerPoints.push_back(pt);
                 }
 

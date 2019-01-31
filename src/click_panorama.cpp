@@ -2,7 +2,7 @@
 //// Created by 八木賢太郎 on 2018/01/12.
 ////
 //#include "panorama.h"
-//#include "basicFunction/basicFunction.h"
+//#include "basicFunctions/basicFunction.h"
 //#include "calcLiniorEquation.h"
 //
 //using namespace std;

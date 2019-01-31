@@ -95,7 +95,7 @@ string digitString(int num, int digit) {
 
 ////画像一覧の.txtファイル生成
 //void makeImageListTxt(string output_path) {
-////    if (checkFileExistence(m_image_txt_path) == false)
+////    if (checkFileExistence(m_image_list_path) == false)
 //    outputImageListText(output_path);
 //}
 
