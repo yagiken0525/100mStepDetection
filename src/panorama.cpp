@@ -71,6 +71,26 @@ void Panorama::trackDetection() {
 
 void Panorama::trackingRunner(){
     selectRunnerCandidates();
+
+//    ofstream opCsvData(_txt_folder + "opData.csv");
+//    for (int i = 0; i < imList.size(); i++) {
+//        ImageInfo im = imList[i];
+//        cv::Mat dummy = im.image;
+//        for (OpenPoseBody hb: im.Runners) {
+//            cv::circle(dummy, hb._body_parts_coord[0], 3, cv::Scalar(0,0,255), 3);
+//            cv::circle(dummy, hb._body_parts_coord[8], 3, cv::Scalar(0,0,255), 3);
+//            cv::circle(dummy, hb._body_parts_coord[14], 3, cv::Scalar(0,0,255), 3);
+//            for(cv::Point2f pt : hb._body_parts_coord){
+//                float x = pt.x - hb._body_parts_coord[0].x;
+//                float y = pt.y - hb._body_parts_coord[0].y;
+//                opCsvData << x << " " << y << " ";
+//            }
+//            cv::imshow("op for keras", dummy);
+//            int key = cv::waitKey();
+//            opCsvData << key - 177 << endl;
+//        }
+//    }
+
     trackTargetRunner();
     getOpenPoseMask();
 }
@@ -78,7 +98,7 @@ void Panorama::trackingRunner(){
 void Panorama::makePanorama(){
     getTranslation();
     getHomographyFromTranslation();
-    transformPanoramaTopview();
+//    transformPanoramaTopview();
     generatePanorama();
 
     //Runnerのいない画像を生成
@@ -100,6 +120,94 @@ void Panorama::estimateStepPoints(){
 }
 
 void Panorama::transformPanoramaTopview(){
+    vector<cv::Point2f> affineSecPts;
+
+
+    //1,８レーン上の一点を抽出
+    const int x = 300;
+    int lineNum = imList[0].grads.size();
+    cv::Point2f pt1(x, x*imList[0].grads[0] + imList[0].segments[0]);
+    cv::Point2f pt2(x, x*imList[0].grads[lineNum-1] + imList[0].segments[lineNum-1]);
+    affineSecPts.push_back(startLineCornerPoints[0]);
+    affineSecPts.push_back(pt1);
+    affineSecPts.push_back(pt2);
+    affineSecPts.push_back(startLineCornerPoints[1]);
+    cv::Mat dummyIm = imList[0].image;
+
+    for(cv::Point2f pt: affineSecPts){
+        cv::circle(dummyIm, pt, 2, cv::Scalar(255,0,0), 2);
+        cv::imshow("a", dummyIm);
+        cv::waitKey();
+    }
+
+
+    //投影先の座標
+    vector<cv::Point2f> affineTarPts;
+    affineTarPts.push_back(cv::Point2f(0,0));
+    affineTarPts.push_back(cv::Point2f(x,0));
+    affineTarPts.push_back(cv::Point2f(x,x));
+    affineTarPts.push_back(cv::Point2f(0,x));
+
+
+//    for(cv::Point2f pt : affineSecPts){
+//        cv::circle(dummyIm, pt, 2, cv::Scalar(255,0,0), 2);
+//        cv::imshow("pt", dummyIm);
+//        cv::waitKey();
+//    }
+
+    //アフィン変換
+    cv::Mat topViewIm = cv::Mat::zeros(x, x, CV_8UC3);
+    affineH = cv::findHomography(affineSecPts, affineTarPts);
+//    cv::warpAffine(dummyIm, topViewIm, H, cv::Size(x, x));
+
+//    affineH = cv::Mat::zeros(3, 3, CV_64F);
+//    affineH .at<double>(0, 0) = H.at<double>(0,0);
+//    affineH .at<double>(0, 1) = H.at<double>(0,1);
+//    affineH .at<double>(0, 2) = H.at<double>(0,2);
+//    affineH .at<double>(1, 0) = H.at<double>(1,0);
+//    affineH .at<double>(1, 1) = H.at<double>(1,1);
+//    affineH .at<double>(1, 2) = H.at<double>(1,2);
+//    affineH .at<double>(2, 2) = 1.0;
+
+//    //８レーン上の一点を抽出
+//    const int x = 300;
+//    int lineNum = imList[0].grads.size();
+//    cv::Point2f pt(x, x*imList[0].grads[lineNum-1] + imList[0].segments[lineNum-1]);
+//    affineSecPts.push_back(pt);
+//
+//    //投影先の座標
+//    vector<cv::Point2f> affineTarPts;
+//    cv::Mat dummyIm = imList[0].image;
+//    affineTarPts.push_back(cv::Point2f(0,0));
+//    affineTarPts.push_back(cv::Point2f(0,x));
+//    affineTarPts.push_back(cv::Point2f(x,x));
+//
+////    for(cv::Point2f pt : affineSecPts){
+////        cv::circle(dummyIm, pt, 2, cv::Scalar(255,0,0), 2);
+////        cv::imshow("pt", dummyIm);
+////        cv::waitKey();
+////    }
+//
+//    //アフィン変換
+//    cv::Mat topViewIm = cv::Mat::zeros(x, x, CV_8UC3);
+//    cv::Mat H = cv::getAffineTransform(affineSecPts, affineTarPts);
+////    cv::warpAffine(dummyIm, topViewIm, H, cv::Size(x, x));
+//
+//    affineH = cv::Mat::zeros(3, 3, CV_64F);
+//    affineH .at<double>(0, 0) = H.at<double>(0,0);
+//    affineH .at<double>(0, 1) = H.at<double>(0,1);
+//    affineH .at<double>(0, 2) = H.at<double>(0,2);
+//    affineH .at<double>(1, 0) = H.at<double>(1,0);
+//    affineH .at<double>(1, 1) = H.at<double>(1,1);
+//    affineH .at<double>(1, 2) = H.at<double>(1,2);
+//    affineH .at<double>(2, 2) = 1.0;
+
+    cout << affineH << endl;
+//    cout << H << endl;
+
+    cv::warpPerspective(dummyIm, topViewIm, affineH, topViewIm.size());
+    cv::imshow("topView", topViewIm);
+    cv::waitKey();
 
 }
 
@@ -153,16 +261,36 @@ void Panorama::selectRunnerCandidates() {
         }
 
         //デバッグランナー候補のみ画像に重畳
+        cv::Scalar FaceColor(255, 0, 0);
+        vector<cv::Scalar> colors;
+        yagi::setColor(&colors);
+
         if (SHOW_RUNNER_CANDIDATES) {
             cv::Mat image = im.image.clone();
-            cv::Scalar FaceColor(255, 0, 0);
             for (OpenPoseBody hb: im.runnerCandidate) {
                 cv::circle(image, hb.getBodyCoord()[0], 5, FaceColor, 5);
+                cv::circle(imList[i].trackLineAndOpenPoseImage, hb.getBodyCoord()[0], 5, FaceColor, 5);
             }
             cv::imshow("runner candidates", image);
-            cv::waitKey(0);
+            cv::waitKey(1);
             imList[frame_index++].runnerCandidatesImage = image;
         }
+
+        //20190131実験
+        //各関節位置を重畳
+//        int humanID = 0;
+//        for (OpenPoseBody hb: imList[i].runnerCandidate) {
+//            for(cv::Point2f pt : hb.getBodyCoord()) {
+//                cv::circle(imList[i].trackLineAndOpenPoseImage, pt, 2, colors[humanID], 2);
+//            }
+//            humanID++;
+//        }
+//
+//
+//
+//
+//        cv::imshow("a", imList[i].trackLineAndOpenPoseImage);
+//        cv::waitKey();
     }
 
     cout << "[Select runner candidate finished]" << endl;
@@ -184,12 +312,18 @@ void Panorama::generatePanorama() {
     mul_H.at<double>(0, 0) = 1;
     mul_H.at<double>(1, 1) = 1;
     mul_H.at<double>(2, 2) = 1;
+    mul_H = mul_H;
+
+    cout << mul_H << endl;
+    cout << affineH.size() << endl;
 
     imList[0].mulH = mul_H.clone();
     imList[0].H = mul_H.clone();
 
     //0フレーム目をベースとする
     cv::Mat base = imList[0].image;
+//    cv::Mat AffineBase;
+//    cv::warpPerspective(base, base, affineH, cv::Size(100, 100));
     cv::Mat result;
     cv::Mat result_pano;
 
@@ -224,10 +358,10 @@ void Panorama::generatePanorama() {
         points.push_back(pt2);
         points.push_back(pt3);
         points.push_back(pt4);
+        cout << mul_H << endl;
         mycalcWarpedPoint(points, &edge_points, mul_H);
 
         //パノラマ画像の更新
-
         x_min = int(edge_points[0].x < edge_points[2].x ? edge_points[0].x : edge_points[2].x);
         x_max = int(edge_points[1].x > edge_points[3].x ? edge_points[1].x : edge_points[3].x);
         y_min = int(edge_points[0].y < edge_points[1].y ? edge_points[0].y : edge_points[1].y);
@@ -255,7 +389,7 @@ void Panorama::generatePanorama() {
 
         if(SHOW_PANORAMA) {
             cv::Mat smallDummy = smallPanorama.clone();
-            cv::resize(smallDummy, smallDummy, cv::Size(), 0.5, 0.5);
+            cv::resize(smallDummy, smallDummy, cv::Size(), 0.1, 0.1);
             cv::imshow("small panorama", smallDummy);
 //            cv::imshow("im", im.image);
             cv::waitKey(0);
@@ -632,6 +766,7 @@ void Panorama::getOverviewHomography(){
     H.convertTo(H, CV_32F);
     this->overView_H = H;
     cout << H << endl;
+
     //俯瞰画像を表示
     cv::Mat overviewImage;
     cv::warpPerspective(this->PanoramaImage, overviewImage, this->overView_H, this->OverView.size());

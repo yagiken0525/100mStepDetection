@@ -70,11 +70,6 @@ cv::Point2f Panorama::templateMatching(cv::Mat& im1, cv::Mat& im2, cv::Rect temp
     cv::Mat templateImg(im1, tempRect);
     cv::Mat templateMask(maskImage, tempRect);
 
-//    cv::imshow("temp", templateImg);
-//    cv::imshow("tempmask", maskImage);
-//    cv::imshow("base", im2);
-//    cv::waitKey();
-
     //テンプレートマッチング
     cv::Mat tempResult;
     cv::matchTemplate(im2, templateImg, tempResult, CV_TM_CCORR_NORMED, templateMask);
@@ -98,7 +93,6 @@ cv::Point2f Panorama::templateMatching(cv::Mat& im1, cv::Mat& im2, cv::Rect temp
         translation.x = max_pt.x;
         translation.y = max_pt.y;
         while ((calc2PointDistance(translation, preTranslation) > MAX_TRANSLATION)) {
-//            cout << frameID << endl;
             mask.at<unsigned char>(max_pt) = 0;
             cv::minMaxLoc(tempResult, NULL, &maxVal, NULL, &max_pt, mask);
             translation.x = max_pt.x;
@@ -106,7 +100,6 @@ cv::Point2f Panorama::templateMatching(cv::Mat& im1, cv::Mat& im2, cv::Rect temp
         }
         imList[frameID].translationList.push_back(translation);
         mask.at<unsigned char>(max_pt) = 0;
-
     }
 
     return imList[frameID].translationList[0];
@@ -128,6 +121,8 @@ void Panorama::showOnlinePoints(ImageInfo& im){
 void Panorama::getTranslationByTempMatching() {
 
     cout << "[calculate translation by template matching]" << endl;
+    ofstream translationTxt(_txt_folder + "/translation.txt");
+    int sumTranslation = 0;
 
     //テンプレートマッチ用のrect size指定
     cv::Point2f start_pt(0, 0);
@@ -145,19 +140,18 @@ void Panorama::getTranslationByTempMatching() {
         if(frameID == 0){
             translation = cv::Point2f(0,0);
         }else {
-//            cv::Mat im1H = getHscaleImage(im1);
-//            cv::Mat im2H = getHscaleImage(im2);
             cv::Mat im1H = imList[frameID].gray_image;
             cv::Mat im2H = imList[frameID - 1].gray_image;
             cv::bitwise_and(imList[frameID].maskimage, imList[frameID].trackAreaMask, imList[frameID].maskimage);
-//            cv::imshow("b", imList[frameID].maskimage);
-//            cv::waitKey();
             translation = templateMatching(im1H, im2H, tempRect, imList[frameID].maskimage, preTranslation, frameID);
         }
         frame_num++;
         im2 = im1;
         preTranslation = translation;
         imList[frameID].translation = translation;
+        sumTranslation += translation.x;
+
+        translationTxt << sumTranslation << endl;
     }
     cv::destroyAllWindows();
     cout << "[calculate translation by template matching finished]" << endl;

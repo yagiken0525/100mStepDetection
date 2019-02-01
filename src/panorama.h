@@ -234,6 +234,7 @@ namespace yagi {
         cv::Mat OriginalPanorama;
         cv::Mat overviewPanorama;
         cv::Mat inv_overView_H;
+        cv::Mat affineH;
 
         int finalLineImageNum;
 
@@ -273,6 +274,7 @@ namespace yagi {
             cv::Mat edge;
             cv::Mat panorama_scale_im;
             cv::Mat trackLineImage;
+            cv::Mat trackLineAndOpenPoseImage;
 
             //mask
             cv::Mat maskimage;

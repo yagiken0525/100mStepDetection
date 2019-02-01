@@ -63,6 +63,7 @@ void Panorama::loadImage() {
         image_info.gray_image = gray_image;
         image_info.hsv_image = img_hsv;
         image_info.edge = edge;
+        image_info.trackLineAndOpenPoseImage = cv::Mat::zeros(image.size(), CV_8UC3);
         preEdge = gray_image;
 
         //DensePoseのマスク

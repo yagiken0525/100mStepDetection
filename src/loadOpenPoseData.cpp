@@ -128,6 +128,11 @@ void Panorama::getOpenPoseMask(){
             hb.openPoseMask = openPoseMask;
             cv::Mat roughMasked = yagi::maskAofB(imList[imID].image, hb.openPoseMask);
             hb.opMaskedImage = roughMasked;
+
+//            if(ops[opID].humanID == 1){
+//                for(int i = 0; i < imList[imID].grads.size(); i++){
+//                }
+//            }
         }
     }
 }

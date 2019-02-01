@@ -128,7 +128,7 @@ void Panorama::trackTracking() {
 
     cout << "[Tracking track line]" << endl;
 
-    ofstream gradTxt("./grad.txt");
+    ofstream gradTxt(_txt_folder + "/grad.txt");
 
     //全画像のループ
     for (int i = 1; i < imList.size(); i++) {
@@ -136,7 +136,7 @@ void Panorama::trackTracking() {
         //今のフレームの画像
         cv::Mat edge = imList[i].edge;
         cv::Mat dummy = imList[i].image.clone();
-
+        float gradAve = 0;
         //全レーンのループ
         for (int line = 0; line <  imList[i - 1].track_lines.size(); line++) {
 
@@ -162,13 +162,16 @@ void Panorama::trackTracking() {
             imList[i].grads.push_back(a);
             imList[i].segments.push_back(b);
 
-
             //デバッグ用カラー画像にライン投影
             drawLine(dummy, pt1, pt2, 1, RED);
+            drawLine(imList[i].trackLineAndOpenPoseImage, pt1, pt2, 1, RED);
             this->imList[i].trackLineImage = dummy.clone();
 
-
+            gradAve += a;
+            gradTxt << a << " ";
         }
+
+        gradTxt << gradAve << endl;
 
 
         //そのフレームのトラック外をマスク
