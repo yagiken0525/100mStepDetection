@@ -8,6 +8,7 @@
 #include <opencv2/opencv.hpp>
 #include "src/panorama.h"
 #include "src/openpose/myOpenPose.h"
+#include "src/basicFunctions/basicFunction.h"
 
 
 
@@ -22,17 +23,17 @@ using namespace cv;
 
 int main() {
 //    string folder_path = "/home/yagi/sfmDR/inputVideos/" + video_name + "/";
-    Panorama Panorama("2009_London");
+    Panorama Panorama("2015_Beijing");
     Panorama.INIT_PROCESSING = false;
     Panorama.videoType = ".mp4";
 //    Panorama.USE_LASTMASK = false;
 //    Panorama.USE_LAST_TRACKLINE = false;
 //    Panorama.USE_LAST_CORNERS = false;
     Panorama.SELECT_TARGET_RANE = false;
-    Panorama.MAX_TRANSLATION = 5;
+    Panorama.MAX_TRANSLATION = 3;
     Panorama.TARGET_RUNNER_ID = 6;
     Panorama.MASK_MARGIN = 50;
-    Panorama.OP_MASK_RADIUS = 10;
+    Panorama.OP_MASK_RADIUS = 15;
     Panorama.FIRST_IM_ID = 10;
     Panorama.LAST_IM_ID = 245;
     Panorama.PROJECTION_STEP = 10;
@@ -47,7 +48,7 @@ int main() {
     Panorama.SHOW_TRACKLINES = false;
 //    Panorama.SHOW_PANORAMA = false;
     Panorama.SHOW_STROBO_PROCESS = false;
-    Panorama.SHOW_RUNNER_CANDIDATES = false;
+//    Panorama.SHOW_RUNNER_CANDIDATES = false;
     Panorama.ESTIMATE_STEPS = false;
     Panorama.GENERATE_STROBO = false;
 //    Panorama.GENERATE_VIRTUALRACE = false;
@@ -57,7 +58,7 @@ int main() {
 
 
 //    Panorama.setVariables(video_name);
-    if (Panorama.INIT_PROCESSING) {
+    if (!checkFileExistence(Panorama._image_list_path)) {
         Panorama.videotoImage();
         outputTextFromVideo(Panorama._video_folder + Panorama._video_name + Panorama.videoType,
                             Panorama._project_path + "/openpose_image/", Panorama._txt_folder);
