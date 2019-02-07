@@ -66,7 +66,7 @@ namespace yagi {
         void getTranslationByOpticalFlow();
         void featurePointFindHomography();
         void maskingRunners();
-        void transformPanoramaTopview();
+        void trackingUsingHead();
 
         void loadingData();
         void loadImage();

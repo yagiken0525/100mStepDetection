@@ -20,21 +20,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="68893670-619a-4ba5-bd85-2b2914098cda" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/README.md" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/basicFunctions" afterPath="$PROJECT_DIR$/src/basicFunctions" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.cpp" afterPath="$PROJECT_DIR$/main.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/click4corners.cpp" afterPath="$PROJECT_DIR$/src/click4corners.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/findHomographyMatrix.cpp" afterPath="$PROJECT_DIR$/src/findHomographyMatrix.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/loadImage.cpp" afterPath="$PROJECT_DIR$/src/loadImage.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/loadOpenPoseData.cpp" afterPath="$PROJECT_DIR$/src/loadOpenPoseData.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/maskTeropArea.cpp" afterPath="$PROJECT_DIR$/src/maskTeropArea.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/openpose/exportHumanPoseTxt.cpp" afterPath="$PROJECT_DIR$/src/openpose/exportHumanPoseTxt.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/panorama.cpp" afterPath="$PROJECT_DIR$/src/panorama.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/panorama.h" afterPath="$PROJECT_DIR$/src/panorama.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/trackingRunner.cpp" afterPath="$PROJECT_DIR$/src/trackingRunner.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/trackingTrack.cpp" afterPath="$PROJECT_DIR$/src/trackingTrack.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/videoToImage/trimVideo.cpp" afterPath="$PROJECT_DIR$/src/videoToImage/trimVideo.cpp" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -46,11 +35,63 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="panorama.cpp" pinned="false" current-in-tab="true">
+      <file leaf-file-name="main.cpp" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/main.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="320">
+              <caret line="68" column="28" lean-forward="true" selection-start-line="68" selection-start-column="28" selection-end-line="68" selection-end-column="28" />
+              <folding>
+                <element signature="e#102#131#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="homography.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/projects/2009_London/texts/homography.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-187">
+              <caret line="10" column="91" lean-forward="true" selection-start-line="10" selection-start-column="91" selection-end-line="10" selection-end-column="91" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="string_conversions.h" pinned="false" current-in-tab="false">
+        <entry file="file:///usr/include/c++/4.8/ext/string_conversions.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="189">
+              <caret line="61" column="0" lean-forward="false" selection-start-line="61" selection-start-column="0" selection-end-line="61" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="basic_string.h" pinned="false" current-in-tab="false">
+        <entry file="file:///usr/include/c++/4.8/bits/basic_string.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="189">
+              <caret line="2853" column="0" lean-forward="false" selection-start-line="2853" selection-start-column="0" selection-end-line="2853" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="loadOpenPoseData.cpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/loadOpenPoseData.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="165">
+              <caret line="244" column="0" lean-forward="false" selection-start-line="244" selection-start-column="0" selection-end-line="244" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="panorama.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/panorama.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
-              <caret line="51" column="16" lean-forward="false" selection-start-line="51" selection-start-column="16" selection-end-line="51" selection-end-column="16" />
+            <state relative-caret-position="180">
+              <caret line="463" column="64" lean-forward="true" selection-start-line="463" selection-start-column="64" selection-end-line="463" selection-end-column="64" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
               </folding>
@@ -58,67 +99,41 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="panorama.jpg" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/projects/IAAF_2/results/panorama.jpg">
-          <provider selected="true" editor-type-id="images">
-            <state />
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="panorama.jpg" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/projects/Unity_1/results/panorama.jpg">
-          <provider selected="true" editor-type-id="images">
-            <state />
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="panorama.jpg" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/projects/2018_Brussel/results/panorama.jpg">
-          <provider selected="true" editor-type-id="images">
-            <state />
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="image0002.jpg" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/projects/2018_Berlin/images/image0002.jpg">
-          <provider selected="true" editor-type-id="images">
-            <state />
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="image0006.jpg" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/projects/2018_Berlin/images/image0006.jpg">
-          <provider selected="true" editor-type-id="images">
-            <state />
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="image0010.jpg" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/projects/2018_Berlin/images/image0010.jpg">
-          <provider selected="true" editor-type-id="images">
-            <state />
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="panorama.jpg" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/projects/2018_Berlin/results/panorama.jpg">
-          <provider selected="true" editor-type-id="images">
-            <state />
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="panorama.jpg" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/projects/2018_London/results/panorama.jpg">
-          <provider selected="true" editor-type-id="images">
-            <state />
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="trimVideo.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/videoToImage/trimVideo.cpp">
+      <file leaf-file-name="virtualRace.cpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/virtualRace.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="223">
-              <caret line="74" column="30" lean-forward="false" selection-start-line="74" selection-start-column="30" selection-end-line="74" selection-end-column="30" />
+            <state relative-caret-position="374">
+              <caret line="35" column="13" lean-forward="false" selection-start-line="30" selection-start-column="11" selection-end-line="35" selection-end-column="13" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="basicFunction.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/basicFunctions/basicFunction.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="200">
+              <caret line="80" column="12" lean-forward="false" selection-start-line="80" selection-start-column="12" selection-end-line="80" selection-end-column="12" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="basicFunction.cpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/basicFunctions/basicFunction.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="291">
+              <caret line="79" column="68" lean-forward="false" selection-start-line="79" selection-start-column="68" selection-end-line="79" selection-end-column="68" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="stl_vector.h" pinned="false" current-in-tab="false">
+        <entry file="file:///usr/include/c++/4.8/bits/stl_vector.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="291">
+              <caret line="247" column="6" lean-forward="false" selection-start-line="247" selection-start-column="6" selection-end-line="247" selection-end-column="6" />
               <folding />
             </state>
           </provider>
@@ -128,7 +143,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>_image_txt_path</find>
       <find>pano.</find>
       <find>_human_area_list</find>
       <find>inputImage</find>
@@ -154,6 +168,11 @@
       <find>putTe</find>
       <find>ifstream</find>
       <find>this</find>
+      <find>transformPanoramaTopview</find>
+      <find>click</find>
+      <find>check</find>
+      <find>line</find>
+      <find>ifst</find>
     </findStrings>
     <replaceStrings>
       <replace>_image_list_path</replace>
@@ -172,6 +191,7 @@
       <replace>rectRoughMasked</replace>
       <replace>histGraph</replace>
       <replace>this</replace>
+      <replace>trackingUsingHead</replace>
       <replace>prev</replace>
     </replaceStrings>
   </component>
@@ -201,10 +221,10 @@
         <option value="$PROJECT_DIR$/src/panorama.h" />
         <option value="$PROJECT_DIR$/src/maskTeropArea.cpp" />
         <option value="$PROJECT_DIR$/src/findHomographyMatrix.cpp" />
-        <option value="$PROJECT_DIR$/src/panorama.cpp" />
         <option value="$PROJECT_DIR$/src/openpose/exportHumanPoseTxt.cpp" />
-        <option value="$PROJECT_DIR$/main.cpp" />
         <option value="$PROJECT_DIR$/src/videoToImage/trimVideo.cpp" />
+        <option value="$PROJECT_DIR$/main.cpp" />
+        <option value="$PROJECT_DIR$/src/panorama.cpp" />
       </list>
     </option>
   </component>
@@ -223,8 +243,8 @@
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="2154" />
-    <option name="y" value="342" />
+    <option name="x" value="2018" />
+    <option name="y" value="396" />
     <option name="width" value="1855" />
     <option name="height" value="1042" />
   </component>
@@ -269,7 +289,31 @@
             <path>
               <item name="runnerSteps" type="dad4c3:CidrFilesViewHelper$MyProjectTreeStructure$1" />
               <item name="100mStepDetection" type="462c0819:PsiDirectoryNode" />
-              <item name="videos" type="462c0819:PsiDirectoryNode" />
+              <item name="projects" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="runnerSteps" type="dad4c3:CidrFilesViewHelper$MyProjectTreeStructure$1" />
+              <item name="100mStepDetection" type="462c0819:PsiDirectoryNode" />
+              <item name="projects" type="462c0819:PsiDirectoryNode" />
+              <item name="2009_London" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="runnerSteps" type="dad4c3:CidrFilesViewHelper$MyProjectTreeStructure$1" />
+              <item name="100mStepDetection" type="462c0819:PsiDirectoryNode" />
+              <item name="projects" type="462c0819:PsiDirectoryNode" />
+              <item name="2009_London" type="462c0819:PsiDirectoryNode" />
+              <item name="texts" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="runnerSteps" type="dad4c3:CidrFilesViewHelper$MyProjectTreeStructure$1" />
+              <item name="100mStepDetection" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="runnerSteps" type="dad4c3:CidrFilesViewHelper$MyProjectTreeStructure$1" />
+              <item name="100mStepDetection" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="basicFunctions" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -358,23 +402,24 @@
       <workItem from="1548820144290" duration="26419000" />
       <workItem from="1549341994741" duration="24232000" />
       <workItem from="1549522485156" duration="7000" />
-      <workItem from="1549522509142" duration="13747000" />
+      <workItem from="1549522509142" duration="16747000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="109802000" />
+    <option name="totallyTimeSpent" value="112802000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1984" y="-4" width="1857" height="1085" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3274244" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295099" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5119917" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3211679" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22523461" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22523461" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15168229" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295099" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -425,189 +470,149 @@
           <option name="timeStamp" value="97" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="98" />
+      <option name="time" value="99" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/projects/IAAF_1/images/image0041.jpg">
+    <entry file="file://$PROJECT_DIR$/projects/2009_London/images/image0040.jpg">
       <provider selected="true" editor-type-id="images">
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/projects/IAAF_1/images/image0050.jpg">
+    <entry file="file://$PROJECT_DIR$/projects/2009_London/images/image0041.jpg">
       <provider selected="true" editor-type-id="images">
         <state />
       </provider>
     </entry>
-    <entry file="file:///usr/local/include/opencv2/core/types.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="183">
-          <caret line="1176" column="0" lean-forward="false" selection-start-line="1176" selection-start-column="0" selection-end-line="1176" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/calcLiniorEquation.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="183">
-          <caret line="59" column="0" lean-forward="false" selection-start-line="59" selection-start-column="0" selection-end-line="59" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/texts/human_pose_info.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/texts/maskArea.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing/results/panorama.jpg">
+    <entry file="file://$PROJECT_DIR$/projects/2009_London/images/image0042.jpg">
       <provider selected="true" editor-type-id="images">
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing/images/image0000.jpg">
+    <entry file="file://$PROJECT_DIR$/projects/2009_London/images/image0045.jpg">
       <provider selected="true" editor-type-id="images">
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing/results/template/bestTemp/image1_0_0.jpg">
+    <entry file="file://$PROJECT_DIR$/projects/2009_London/openpose_image/0002.jpg">
       <provider selected="true" editor-type-id="images">
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/trackingTrack.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="257">
-          <caret line="155" column="43" lean-forward="false" selection-start-line="155" selection-start-column="43" selection-end-line="155" selection-end-column="43" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2016_Rio/results/panorama.jpg">
+    <entry file="file://$PROJECT_DIR$/projects/2009_London/openpose_image/0014.jpg">
       <provider selected="true" editor-type-id="images">
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/basicFunctions/basicFunction.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="68" column="0" lean-forward="false" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/basicFunctions/basicFunction.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="257">
-          <caret line="32" column="25" lean-forward="true" selection-start-line="32" selection-start-column="25" selection-end-line="32" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/loadImage.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="73" column="42" lean-forward="false" selection-start-line="73" selection-start-column="42" selection-end-line="73" selection-end-column="42" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/panorama.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="458">
-          <caret line="352" column="19" lean-forward="true" selection-start-line="352" selection-start-column="19" selection-end-line="352" selection-end-column="19" />
-          <folding>
-            <element signature="e#14#45#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/basicFunctions/openpose/myOpenPose.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-548">
-          <caret line="136" column="8" lean-forward="false" selection-start-line="136" selection-start-column="8" selection-end-line="136" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/loadOpenPoseData.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="166">
-          <caret line="67" column="23" lean-forward="false" selection-start-line="67" selection-start-column="23" selection-end-line="67" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/maskTeropArea.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="268">
-          <caret line="91" column="9" lean-forward="false" selection-start-line="85" selection-start-column="7" selection-end-line="91" selection-end-column="9" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2018_London/texts/translation.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2193">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/include/c++/4.8/ext/string_conversions.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="175">
-          <caret line="64" column="0" lean-forward="false" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2016_Rio/texts/translation.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2856">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2018_Brussel/images/image0001.jpg">
+    <entry file="file://$PROJECT_DIR$/projects/2009_London/openpose_image/0017.jpg">
       <provider selected="true" editor-type-id="images">
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing/images/image0001.jpg">
+    <entry file="file://$PROJECT_DIR$/projects/2009_London/openpose_image/0019.jpg">
       <provider selected="true" editor-type-id="images">
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing2/texts/grad.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="23" column="6" lean-forward="false" selection-start-line="23" selection-start-column="6" selection-end-line="23" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing2/results/panorama.jpg">
+    <entry file="file://$PROJECT_DIR$/projects/2009_London/openpose_image/0021.jpg">
       <provider selected="true" editor-type-id="images">
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/findHomographyMatrix.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="298">
-          <caret line="131" column="26" lean-forward="false" selection-start-line="131" selection-start-column="26" selection-end-line="131" selection-end-column="26" />
-          <folding />
-        </state>
+    <entry file="file://$PROJECT_DIR$/projects/2009_London/openpose_image/0025.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2009_London/openpose_image/0027.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2009_London/openpose_image/0028.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0000.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0001.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0003.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0005.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0007.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0009.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0011.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0015.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0018.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0019.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0020.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0021.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0022.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0023.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0024.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0025.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/results/panorama.jpg">
@@ -615,147 +620,149 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/openpose/exportHumanPoseTxt.cpp">
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0002.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0026.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0028.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0040.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0046.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0052.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0058.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0064.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0070.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0076.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing_w/openpose_image/0082.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2016_Rio/texts/translation.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="28">
-          <caret line="103" column="35" lean-forward="false" selection-start-line="103" selection-start-column="35" selection-end-line="103" selection-end-column="35" />
+        <state relative-caret-position="-3212">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file:///usr/local/include/opencv2/core/matx.hpp">
+    <entry file="file://$PROJECT_DIR$/src/basicFunctions/basicFunction.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="200">
+          <caret line="80" column="12" lean-forward="false" selection-start-line="80" selection-start-column="12" selection-end-line="80" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/basicFunctions/basicFunction.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="291">
+          <caret line="79" column="68" lean-forward="false" selection-start-line="79" selection-start-column="68" selection-end-line="79" selection-end-column="68" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/4.8/bits/stl_vector.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="291">
+          <caret line="247" column="6" lean-forward="false" selection-start-line="247" selection-start-column="6" selection-end-line="247" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/loadOpenPoseData.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="244" column="0" lean-forward="false" selection-start-line="244" selection-start-column="0" selection-end-line="244" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/virtualRace.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="374">
+          <caret line="35" column="13" lean-forward="false" selection-start-line="30" selection-start-column="11" selection-end-line="35" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2009_London/texts/homography.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-187">
+          <caret line="10" column="91" lean-forward="true" selection-start-line="10" selection-start-column="91" selection-end-line="10" selection-end-column="91" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/4.8/ext/string_conversions.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="189">
-          <caret line="1300" column="0" lean-forward="false" selection-start-line="1300" selection-start-column="0" selection-end-line="1300" selection-end-column="0" />
+          <caret line="61" column="0" lean-forward="false" selection-start-line="61" selection-start-column="0" selection-end-line="61" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing/texts/human_pose_info.txt">
+    <entry file="file:///usr/include/c++/4.8/bits/basic_string.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="189">
+          <caret line="2853" column="0" lean-forward="false" selection-start-line="2853" selection-start-column="0" selection-end-line="2853" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing/texts/imagelist.txt">
+    <entry file="file://$PROJECT_DIR$/src/panorama.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-306">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+        <state relative-caret-position="180">
+          <caret line="463" column="64" lean-forward="true" selection-start-line="463" selection-start-column="64" selection-end-line="463" selection-end-column="64" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="290">
-          <caret line="61" column="18" lean-forward="false" selection-start-line="61" selection-start-column="18" selection-end-line="61" selection-end-column="18" />
+        <state relative-caret-position="320">
+          <caret line="68" column="28" lean-forward="true" selection-start-line="68" selection-start-column="28" selection-end-line="68" selection-end-column="28" />
           <folding>
             <element signature="e#102#131#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/videoToImage/trimVideo.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="223">
-          <caret line="74" column="30" lean-forward="false" selection-start-line="74" selection-start-column="30" selection-end-line="74" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing/images/image0003.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing/images/image0002.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing/images/image0004.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing/images/image0005.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing/images/image0006.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing/images/image0008.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing/images/image0010.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing/images/image0012.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2015_Beijing/images/image0014.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2018_Berlin/images/image0002.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2018_Berlin/images/image0006.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2018_Berlin/images/image0010.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2018_Brussel/results/panorama.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2018_Berlin/results/panorama.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2018_London/results/panorama.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/IAAF_2/results/panorama.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/Unity_1/results/panorama.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/panorama.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="51" column="16" lean-forward="false" selection-start-line="51" selection-start-column="16" selection-end-line="51" selection-end-column="16" />
-          <folding>
-            <element signature="e#0#21#0" expanded="true" />
           </folding>
         </state>
       </provider>

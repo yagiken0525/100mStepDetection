@@ -23,7 +23,7 @@ using namespace cv;
 
 int main() {
 //    string folder_path = "/home/yagi/sfmDR/inputVideos/" + video_name + "/";
-    Panorama Panorama("2015_Beijing");
+    Panorama Panorama("2009_London");
     Panorama.INIT_PROCESSING = false;
     Panorama.videoType = ".mp4";
 //    Panorama.USE_LASTMASK = false;
@@ -46,9 +46,9 @@ int main() {
     Panorama.SHOW_TRANSLATION = false;
     Panorama.SHOW_HOMOGRAPHY = false;
     Panorama.SHOW_TRACKLINES = false;
-//    Panorama.SHOW_PANORAMA = false;
+    Panorama.SHOW_PANORAMA = false;
     Panorama.SHOW_STROBO_PROCESS = false;
-//    Panorama.SHOW_RUNNER_CANDIDATES = false;
+    Panorama.SHOW_RUNNER_CANDIDATES = false;
     Panorama.ESTIMATE_STEPS = false;
     Panorama.GENERATE_STROBO = false;
 //    Panorama.GENERATE_VIRTUALRACE = false;
@@ -66,8 +66,9 @@ int main() {
     Panorama.loadingData();
     Panorama.masking();
     Panorama.trackDetection();
-    Panorama.trackingRunner();
     Panorama.makePanorama();
+    Panorama.trackingRunner();
+
     Panorama.saveData();
     if(Panorama.GENERATE_STROBO)
         Panorama.makeStroboRangeImage();

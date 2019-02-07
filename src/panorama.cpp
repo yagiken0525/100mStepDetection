@@ -67,10 +67,17 @@ void Panorama::trackDetection() {
     selectTrack();
     trackTracking();
     startFinishLineSelect();
+    getOpenPoseMask();
 }
 
 void Panorama::trackingRunner() {
-    getOpenPoseMask();
+//    selectRunnerCandidates();
+//    trackingUsingHead();
+    vector<cv::Point2f> trackInitPts;
+    clickPoints(imList[0].image, trackInitPts);
+    for(cv::Point2f pt: trackInitPts){
+        cout << pt << endl;
+    }
 
 
     //最も近い直線を算出
@@ -190,7 +197,6 @@ void Panorama::trackingRunner() {
 
 
 
-        selectRunnerCandidates();
 //    ofstream opCsvData(_txt_folder + "opData.csv");
 //    for (int i = 0; i < imList.size(); i++) {
 //        ImageInfo im = imList[i];
@@ -216,7 +222,6 @@ void Panorama::trackingRunner() {
 void Panorama::makePanorama(){
     getTranslation();
     getHomographyFromTranslation();
-//    transformPanoramaTopview();
     generatePanorama();
 
     //Runnerのいない画像を生成
@@ -237,182 +242,97 @@ void Panorama::estimateStepPoints(){
     projectOverview();
 }
 
-void Panorama::transformPanoramaTopview(){
-    vector<cv::Point2f> affineSecPts;
 
-
-    //1,８レーン上の一点を抽出
-    const int x = 300;
-    int lineNum = imList[0].grads.size();
-    cv::Point2f pt1(x, x*imList[0].grads[0] + imList[0].segments[0]);
-    cv::Point2f pt2(x, x*imList[0].grads[lineNum-1] + imList[0].segments[lineNum-1]);
-    affineSecPts.push_back(startLineCornerPoints[0]);
-    affineSecPts.push_back(pt1);
-    affineSecPts.push_back(pt2);
-    affineSecPts.push_back(startLineCornerPoints[1]);
-    cv::Mat dummyIm = imList[0].image;
-
-    for(cv::Point2f pt: affineSecPts){
-        cv::circle(dummyIm, pt, 2, cv::Scalar(255,0,0), 2);
-        cv::imshow("a", dummyIm);
-        cv::waitKey();
-    }
-
-
-    //投影先の座標
-    vector<cv::Point2f> affineTarPts;
-    affineTarPts.push_back(cv::Point2f(0,0));
-    affineTarPts.push_back(cv::Point2f(x,0));
-    affineTarPts.push_back(cv::Point2f(x,x));
-    affineTarPts.push_back(cv::Point2f(0,x));
-
-
-//    for(cv::Point2f pt : affineSecPts){
-//        cv::circle(dummyIm, pt, 2, cv::Scalar(255,0,0), 2);
-//        cv::imshow("pt", dummyIm);
-//        cv::waitKey();
-//    }
-
-    //アフィン変換
-    cv::Mat topViewIm = cv::Mat::zeros(x, x, CV_8UC3);
-    affineH = cv::findHomography(affineSecPts, affineTarPts);
-//    cv::warpAffine(dummyIm, topViewIm, H, cv::Size(x, x));
-
-//    affineH = cv::Mat::zeros(3, 3, CV_64F);
-//    affineH .at<double>(0, 0) = H.at<double>(0,0);
-//    affineH .at<double>(0, 1) = H.at<double>(0,1);
-//    affineH .at<double>(0, 2) = H.at<double>(0,2);
-//    affineH .at<double>(1, 0) = H.at<double>(1,0);
-//    affineH .at<double>(1, 1) = H.at<double>(1,1);
-//    affineH .at<double>(1, 2) = H.at<double>(1,2);
-//    affineH .at<double>(2, 2) = 1.0;
-
-//    //８レーン上の一点を抽出
-//    const int x = 300;
-//    int lineNum = imList[0].grads.size();
-//    cv::Point2f pt(x, x*imList[0].grads[lineNum-1] + imList[0].segments[lineNum-1]);
-//    affineSecPts.push_back(pt);
-//
-//    //投影先の座標
-//    vector<cv::Point2f> affineTarPts;
-//    cv::Mat dummyIm = imList[0].image;
-//    affineTarPts.push_back(cv::Point2f(0,0));
-//    affineTarPts.push_back(cv::Point2f(0,x));
-//    affineTarPts.push_back(cv::Point2f(x,x));
-//
-////    for(cv::Point2f pt : affineSecPts){
-////        cv::circle(dummyIm, pt, 2, cv::Scalar(255,0,0), 2);
-////        cv::imshow("pt", dummyIm);
-////        cv::waitKey();
-////    }
-//
-//    //アフィン変換
-//    cv::Mat topViewIm = cv::Mat::zeros(x, x, CV_8UC3);
-//    cv::Mat H = cv::getAffineTransform(affineSecPts, affineTarPts);
-////    cv::warpAffine(dummyIm, topViewIm, H, cv::Size(x, x));
-//
-//    affineH = cv::Mat::zeros(3, 3, CV_64F);
-//    affineH .at<double>(0, 0) = H.at<double>(0,0);
-//    affineH .at<double>(0, 1) = H.at<double>(0,1);
-//    affineH .at<double>(0, 2) = H.at<double>(0,2);
-//    affineH .at<double>(1, 0) = H.at<double>(1,0);
-//    affineH .at<double>(1, 1) = H.at<double>(1,1);
-//    affineH .at<double>(1, 2) = H.at<double>(1,2);
-//    affineH .at<double>(2, 2) = 1.0;
-
-    cout << affineH << endl;
-//    cout << H << endl;
-
-    cv::warpPerspective(dummyIm, topViewIm, affineH, topViewIm.size());
-    cv::imshow("topView", topViewIm);
-    cv::waitKey();
-
-}
 
 void Panorama::selectRunnerCandidates() {
-
     cout << "[Select runner candidate]" << endl;
 
-    int frame_index = 0;
-    for (int i = 0; i < imList.size() - 1; i++) {
-        ImageInfo im = imList[i];
-
-        // 1レーン目の直線方程式
-        float a1, b1;
-        a1 = im.grads[0];
-        b1 = im.segments[0];
-
-        // 9レーン目の直線方程式
-        float a9, b9;
-        a9 = im.grads[im.grads.size() - 1];
-        b9 = im.segments[im.grads.size() - 1];
-
-        //このフレームに映る人物の中から選手候補となる人物を選択
-        for (OpenPoseBody hb: im.Runners) {
-
-            cv::Point2f head = hb.getBodyCoord()[0];
-            cv::Point2f R_leg = hb.getBodyCoord()[10];
-            cv::Point2f L_leg = hb.getBodyCoord()[13];
-
-            //頭部、両足座標(0,0)なら無視
-            if ((head.x == 0 && R_leg.x == 0 && L_leg.x == 0)) {
-                continue;
-
-                //１、頭座標が9レーン目の外なら選手でない
-            } else {
-                if (head.y > ((a9 * head.x) + b9)) {
-                    continue;
-                }
-
-                //2、足座標が１レーン目の外なら選手でない
-                if ((R_leg.y < (a1 * R_leg.x + b1)) || (L_leg.y < (a1 * L_leg.x + b1))) {
-                    continue;
-                }
-
-                //3、足座標が9レーン目の外なら選手でない
-                if ((R_leg.y > (a9 * R_leg.x + b9)) || (L_leg.y > (a9 * L_leg.x + b9))) {
-                    continue;
-                }
-            }
-
-            imList[i].runnerCandidate.push_back(hb);
-        }
-
-        //デバッグランナー候補のみ画像に重畳
-        cv::Scalar FaceColor(255, 0, 0);
-        vector<cv::Scalar> colors;
-        yagi::setColor(&colors);
-
-        if (SHOW_RUNNER_CANDIDATES) {
-            cv::Mat image = im.image.clone();
-            for (OpenPoseBody hb: im.runnerCandidate) {
-                cv::circle(image, hb.getBodyCoord()[0], 5, FaceColor, 5);
-                cv::circle(imList[i].trackLineAndOpenPoseImage, hb.getBodyCoord()[0], 5, FaceColor, 5);
-            }
-            cv::imshow("runner candidates", image);
-            cv::waitKey(1);
-            imList[frame_index++].runnerCandidatesImage = image;
-        }
-
-        //20190131実験
-        //各関節位置を重畳
-//        int humanID = 0;
-//        for (OpenPoseBody hb: imList[i].runnerCandidate) {
-//            for(cv::Point2f pt : hb.getBodyCoord()) {
-//                cv::circle(imList[i].trackLineAndOpenPoseImage, pt, 2, colors[humanID], 2);
+//    int frame_index = 0;
+//    for (int i = 0; i < imList.size() - 1; i++) {
+//        ImageInfo im = imList[i];
+//
+//        // 1レーン目の直線方程式
+//        float a1, b1;
+//        a1 = im.grads[0];
+//        b1 = im.segments[0];
+//
+//        // 9レーン目の直線方程式
+//        float a9, b9;
+//        a9 = im.grads[im.grads.size() - 1];
+//        b9 = im.segments[im.grads.size() - 1];
+//
+//        //このフレームに映る人物の中から選手候補となる人物を選択
+//        cv::Point2f zero(0,0);
+//        for (OpenPoseBody hb: im.Runners) {
+//            for(cv::Point2f pt : hb._body_parts_coord) {
+////                if () {
+////                    if (head.y > ((a9 * head.x) + b9)) {
+////                        continue;
+////                    }
+////            cv::Point2f head = hb.getBodyCoord()[0];
+////            cv::Point2f R_leg = hb.getBodyCoord()[10];
+////            cv::Point2f L_leg = hb.getBodyCoord()[13];
+////
+////            //頭部、両足座標(0,0)なら無視
+////            if ((head.x == 0 && R_leg.x == 0 && L_leg.x == 0)) {
+////                continue;
+////
+////                //１、頭座標が9レーン目の外なら選手でない
+////            } else {
+////                if (head.y > ((a9 * head.x) + b9)) {
+////                    continue;
+////                }
+////
+////                //2、足座標が１レーン目の外なら選手でない
+////                if ((R_leg.y < (a1 * R_leg.x + b1)) || (L_leg.y < (a1 * L_leg.x + b1))) {
+////                    continue;
+////                }
+////
+////                //3、足座標が9レーン目の外なら選手でない
+////                if ((R_leg.y > (a9 * R_leg.x + b9)) || (L_leg.y > (a9 * L_leg.x + b9))) {
+////                    continue;
+////                }
+//                }
 //            }
-//            humanID++;
+//
+//            imList[i].runnerCandidate.push_back(hb);
 //        }
 //
+//        //デバッグランナー候補のみ画像に重畳
+//        cv::Scalar FaceColor(255, 0, 0);
+//        vector<cv::Scalar> colors;
+//        yagi::setColor(&colors);
 //
+//        if (SHOW_RUNNER_CANDIDATES) {
+//            cv::Mat image = im.image.clone();
+//            for (OpenPoseBody hb: im.runnerCandidate) {
+//                cv::circle(image, hb.getBodyCoord()[0], 5, FaceColor, 5);
+//                cv::circle(imList[i].trackLineAndOpenPoseImage, hb.getBodyCoord()[0], 5, FaceColor, 5);
+//            }
+//            cv::imshow("runner candidates", image);
+//            cv::waitKey(1);
+//            imList[frame_index++].runnerCandidatesImage = image;
+//        }
 //
+//        //20190131実験
+//        //各関節位置を重畳
+////        int humanID = 0;
+////        for (OpenPoseBody hb: imList[i].runnerCandidate) {
+////            for(cv::Point2f pt : hb.getBodyCoord()) {
+////                cv::circle(imList[i].trackLineAndOpenPoseImage, pt, 2, colors[humanID], 2);
+////            }
+////            humanID++;
+////        }
+////
+////
+////
+////
+////        cv::imshow("a", imList[i].trackLineAndOpenPoseImage);
+////        cv::waitKey();
+//    }
 //
-//        cv::imshow("a", imList[i].trackLineAndOpenPoseImage);
-//        cv::waitKey();
-    }
-
-    cout << "[Select runner candidate finished]" << endl;
-
+//    cout << "[Select runner candidate finished]" << endl;
+//
 
 }
 
@@ -422,136 +342,138 @@ void Panorama::generatePanorama() {
 
     cout << "[Generate panoramic image]" << endl;
 
-    vector<cv::Point2f> headsInAllIm;
-    vector<cv::Scalar> colors;
-    yagi::setColor(&colors);
+    string file_name = _txt_folder + "/homography.txt";
+    if(!checkFileExistence(file_name)) {
+        ofstream ofs(file_name);
 
-    //パノラマ画像生成
-    cv::Mat mul_H = cv::Mat::zeros(3, 3, CV_64F);
-    mul_H.at<double>(0, 0) = 1;
-    mul_H.at<double>(1, 1) = 1;
-    mul_H.at<double>(2, 2) = 1;
-    mul_H = mul_H;
+        vector<cv::Scalar> colors;
+        yagi::setColor(&colors);
 
-    cout << mul_H << endl;
-    cout << affineH.size() << endl;
+        //パノラマ画像生成
+        cv::Mat mul_H = cv::Mat::zeros(3, 3, CV_64F);
+        mul_H.at<double>(0, 0) = 1;
+        mul_H.at<double>(1, 1) = 1;
+        mul_H.at<double>(2, 2) = 1;
+        mul_H = mul_H;
 
-    imList[0].mulH = mul_H.clone();
-    imList[0].H = mul_H.clone();
+        imList[0].mulH = mul_H.clone();
+        imList[0].H = mul_H.clone();
 
-    //0フレーム目をベースとする
-    cv::Mat base = imList[0].image;
-//    cv::Mat AffineBase;
-//    cv::warpPerspective(base, base, affineH, cv::Size(100, 100));
-    cv::Mat result;
-    cv::Mat result_pano;
+        //0フレーム目をベースとする
+        cv::Mat base = imList[0].image;
+        cv::Mat result;
+        cv::Mat result_pano;
 
-    //パノラマ画像に0フレーム目を貼り付け
-    for (int x = 0; x < base.rows; x++) {
-        for (int y = 0; y < base.cols; y++) {
-            this->PanoramaImage.at<cv::Vec3b>(x, y) = base.at<cv::Vec3b>(x, y);
-        }
-    }
-    cv::Vec3b BLACK(0, 0, 0);
-    int frame_counter = 1;
-    int x_min, y_min, x_max, y_max;
-    for (frame_counter; frame_counter< imList.size();frame_counter++) {
-
-        ImageInfo im = imList[frame_counter];
-
-        //ホモグラフィー掛け合わせ
-        mul_H *= im.H;
-
-        //ホモグラフィーの更新
-        cv::Mat mul_clone = mul_H.clone();
-        imList[frame_counter].mulH = mul_clone;
-
-        //端の4点の斜影位置を求める
-        vector<cv::Point2f> edge_points;
-        vector<cv::Point2f> points;
-        cv::Point2f pt1(0, 0);
-        cv::Point2f pt2(im.image.cols, 0);
-        cv::Point2f pt3(0, im.image.rows);
-        cv::Point2f pt4(im.image.cols, im.image.rows);
-        points.push_back(pt1);
-        points.push_back(pt2);
-        points.push_back(pt3);
-        points.push_back(pt4);
-        cout << mul_H << endl;
-        mycalcWarpedPoint(points, &edge_points, mul_H);
-
-
-        //パノラマ画像の更新
-        x_min = int(edge_points[0].x < edge_points[2].x ? edge_points[0].x : edge_points[2].x);
-        x_max = int(edge_points[1].x > edge_points[3].x ? edge_points[1].x : edge_points[3].x);
-        y_min = int(edge_points[0].y < edge_points[1].y ? edge_points[0].y : edge_points[1].y);
-        y_max = int(edge_points[2].y > edge_points[3].y ? edge_points[2].y : edge_points[3].y);
-        x_min = (x_min > 0 ? x_min : 0);
-        y_min = (y_min > 0 ? y_min : 0);
-
-        //ワーピング
-        cv::warpPerspective(imList[frame_counter].image, result_pano, mul_H,
-                            cv::Size(x_max, y_max), CV_HAL_BORDER_CONSTANT);
-        this->imList[frame_counter].panorama_scale_im = result_pano;
-
-        cout << frame_counter << " th frame is added to Panorama" << endl;
-        for (int x = x_min; x < x_max ; x++) {
-            for (int y = y_min; y < y_max ; y++) {
-                if ((result_pano.at<cv::Vec3b>(y, x) != BLACK)) {
-                    PanoramaImage.at<cv::Vec3b>(y, x) = result_pano.at<cv::Vec3b>(y, x);
-                }
+        //パノラマ画像に0フレーム目を貼り付け
+        for (int x = 0; x < base.rows; x++) {
+            for (int y = 0; y < base.cols; y++) {
+                this->PanoramaImage.at<cv::Vec3b>(x, y) = base.at<cv::Vec3b>(x, y);
             }
         }
 
-        //頭位置を投影
-        vector<cv::Point2f> heads;
-        for(OpenPoseBody op : im.Runners){
-            heads.push_back(op._body_parts_coord[0]);
-        }
-        vector<cv::Point2f> headsPanorama;
-        mycalcWarpedPoint(heads, &headsPanorama, mul_H);
+        cv::Vec3b BLACK(0, 0, 0);
+        int frame_counter = 1;
+        int x_min, y_min, x_max, y_max;
+        for (frame_counter; frame_counter < imList.size(); frame_counter++) {
 
-        for(cv::Point2f pt: headsPanorama){
-            headsInAllIm.push_back(pt);
+            ImageInfo im = imList[frame_counter];
+            mul_H *= im.H;
+
+            //ホモグラフィーの更新
+            cv::Mat mul_clone = mul_H.clone();
+            imList[frame_counter].mulH = mul_clone;
+
+            //端の4点の斜影位置を求める
+            vector<cv::Point2f> edge_points;
+            vector<cv::Point2f> points;
+            cv::Point2f pt1(0, 0);
+            cv::Point2f pt2(im.image.cols, 0);
+            cv::Point2f pt3(0, im.image.rows);
+            cv::Point2f pt4(im.image.cols, im.image.rows);
+            points.push_back(pt1);
+            points.push_back(pt2);
+            points.push_back(pt3);
+            points.push_back(pt4);
+            cout << mul_H << endl;
+            mycalcWarpedPoint(points, &edge_points, mul_H);
+
+            //パノラマ画像の更新
+            x_min = int(edge_points[0].x < edge_points[2].x ? edge_points[0].x : edge_points[2].x);
+            x_max = int(edge_points[1].x > edge_points[3].x ? edge_points[1].x : edge_points[3].x);
+            y_min = int(edge_points[0].y < edge_points[1].y ? edge_points[0].y : edge_points[1].y);
+            y_max = int(edge_points[2].y > edge_points[3].y ? edge_points[2].y : edge_points[3].y);
+            x_min = (x_min > 0 ? x_min : 0);
+            y_min = (y_min > 0 ? y_min : 0);
+
+            //ワーピング
+            cv::warpPerspective(imList[frame_counter].image, result_pano, mul_H,
+                                cv::Size(x_max, y_max), CV_HAL_BORDER_CONSTANT);
+            this->imList[frame_counter].panorama_scale_im = result_pano;
+
+            cout << frame_counter << " th frame is added to Panorama" << endl;
+            for (int x = x_min; x < x_max; x++) {
+                for (int y = y_min; y < y_max; y++) {
+                    if ((result_pano.at<cv::Vec3b>(y, x) != BLACK)) {
+                        PanoramaImage.at<cv::Vec3b>(y, x) = result_pano.at<cv::Vec3b>(y, x);
+                    }
+                }
+            }
+
+            //パノラマの途中経過
+            cv::Rect rect(0, 0, x_max, y_max);
+            cv::Mat smallPanorama(PanoramaImage, rect);
+
+            if (SHOW_PANORAMA) {
+                cv::Mat smallDummy = smallPanorama.clone();
+                cv::resize(smallDummy, smallDummy, cv::Size(), 0.6, 0.6);
+                cv::imshow("small panorama", smallDummy);
+                cv::waitKey(0);
+            }
+
+            //ホモグラフィー出力
+            for(int i = 0; i < 3; i++){
+                for(int j = 0; j < 3; j++){
+                    ofs << mul_H.at<double>(i, j) << " ";
+                }
+            }
+            ofs << endl;
+
         }
 
-        for(cv::Point2f pt: headsInAllIm){
-            cv::circle(PanoramaImage, pt, 2, cv::Scalar(0,0,255), 2);
-        }
-
-        //パノラマの途中経過
         cv::Rect rect(0, 0, x_max, y_max);
-        cv::Mat smallPanorama(PanoramaImage, rect);
+        cv::Mat panorama(PanoramaImage, rect);
 
-        if(SHOW_PANORAMA) {
-            cv::Mat smallDummy = smallPanorama.clone();
-            cv::resize(smallDummy, smallDummy, cv::Size(), 0.6, 0.6);
-            cv::imshow("small panorama", smallDummy);
-//            cv::imshow("im", im.image);
-            cv::waitKey(0);
+        this->OriginalPanorama = panorama.clone();
+        this->Panorama_width = panorama.cols;
+        this->Panorama_height = panorama.rows;
+
+        cv::Mat smallPanorama;
+        cv::resize(panorama, smallPanorama, cv::Size(), smallPanorama_width / Panorama_width,
+                   smallPanorama_height / Panorama_height);
+        this->smallPanoramaImage = smallPanorama;
+        ofs.close();
+    }else{
+        string str;
+        ifstream ifs(file_name);
+        int frameID = 0;
+        while(getline(ifs, str)){
+            vector<string> words = split(str, ' ');
+            cv::Mat H = cv::Mat::zeros(3, 3, CV_64F);
+            for(int i = 0; i < 3; i++){
+                for(int j = 0; j < 3; j++){
+                    H.at<double>(i, j) = stod(words[i * 3 + j]);
+                }
+            }
+            imList[frameID].mulH = H;
         }
-
+        this->smallPanoramaImage = cv::imread(_result_folder + "/panorama.jpg");
+        ifs.close();
     }
 
-    cv::Rect rect(0, 0, x_max, y_max);
-    cv::Mat panorama(PanoramaImage, rect);
-
-    //画面に表示できるようにリサイズ
-//    cv::imwrite(_result_folder + "panorama.jpg", panorama);
-    this->OriginalPanorama = panorama.clone();
-
-    this->Panorama_width = panorama.cols;
-    this->Panorama_height = panorama.rows;
-
-    cv::Mat smallPanorama;
-    cv::resize(panorama, smallPanorama, cv::Size(), smallPanorama_width / Panorama_width,
-               smallPanorama_height / Panorama_height);
-    this->smallPanoramaImage = smallPanorama;
 
     cv::imshow("panorama", this->smallPanoramaImage);
     cv::waitKey();
     cv::imwrite(_result_folder + "/panorama.jpg", this->smallPanoramaImage);
-
     cv::destroyAllWindows();
 
     cout << "[Generate panoramic image finished]" << endl;
@@ -2719,6 +2641,7 @@ void Panorama::getTranslation(){
         {
             vector<string> words = split(str, ' ');
             imList[imID].translation = cv::Point2f(stof(words[0]), stof(words[1]));
+            imID++;
         }
         ifs.close();
     }
