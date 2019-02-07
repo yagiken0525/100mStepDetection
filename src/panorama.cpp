@@ -69,9 +69,128 @@ void Panorama::trackDetection() {
     startFinishLineSelect();
 }
 
-void Panorama::trackingRunner(){
-    selectRunnerCandidates();
+void Panorama::trackingRunner() {
+    getOpenPoseMask();
 
+
+    //最も近い直線を算出
+    for (int i = 0; i < imList.size(); i++) {
+        ImageInfo &im = imList[i];
+        int humanID = 0;
+        for(int k = 0; k < im.Runners.size(); k++) {
+            float minDist = 1000000;
+            int minLineID = 0;
+            float distR = distPoint2Line(im.Runners[k].rFoot, im.grads[0], im.segments[0]);
+            float distL = distPoint2Line(im.Runners[k].lFoot, im.grads[0], im.segments[0]);
+            cv::Point2f foot = (distR > distL ? im.Runners[k].rFoot : im.Runners[k].lFoot);
+            cv::Point2f other_foot = (distR > distL ? im.Runners[k].lFoot : im.Runners[k].rFoot);
+            im.Runners[k].outLineDist = (distR > distL ? distR : distL);
+            foot.y += 0;
+            for(int lineID = 0; lineID < im.grads.size(); lineID++){
+                float dist = distPoint2Line(foot, im.grads[lineID], im.segments[lineID]);
+                if(dist < minDist){
+                    minDist = dist;
+                    minLineID = lineID;
+                }
+            }
+            im.Runners[k].humanID = minLineID;
+            if(minLineID == 8) {
+                cv::circle(im.image, foot, 2, cv::Scalar(255, 0, 0), 2);
+                cv::circle(im.image, other_foot, 2, cv::Scalar(0, 0, 255), 2);
+            }
+//            cv::putText(im.image, to_string(int(im.Runners[k].outLineDist)), foot,
+//                        cv::FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(0, 0, 200), 2, CV_AA);
+        }
+//        cv::imshow("a", im.image);
+//        cv::waitKey();
+
+    }
+
+
+    ImageInfo preIm;
+    for (int i = 0; i < imList.size(); i++) {
+        ImageInfo im = imList[i];
+        int humanID = 0;
+        for(int k = 0; k < im.Runners.size(); k++) {
+            OpenPoseBody hb = im.Runners[k];
+            if(i == 0){
+//                imList[i].Runners[k].humanID = humanID;
+            }else {
+                float maxHist = 0;
+                int validJointsNum = 0;
+                float minDist = 10000000000;
+                vector<cv::Point2f> joints = hb.getBodyCoord();
+                for (OpenPoseBody pre_hb: preIm.Runners) {
+                    //ヒストグラム
+                    float sumHist = 0;
+                    sumHist+=cv::compareHist(hb.histChannel[0], pre_hb.histChannel[0], 0);
+                    sumHist+=cv::compareHist(hb.histChannel[1], pre_hb.histChannel[1], 0);
+                    sumHist+=cv::compareHist(hb.histChannel[2], pre_hb.histChannel[2], 0);
+
+//                    cv::imshow("hb_G", hb.histGraph[1]);
+//                    cv::imshow("prehb_G", pre_hb.histGraph[1]);
+//                    cv::imshow("hb_B", hb.histGraph[2]);
+//                    cv::imshow("prehb_B", pre_hb.histGraph[2]);
+                    cout << pre_hb.humanID << " " << sumHist << endl;
+//                    if(maxHist < sumHist){
+//                        maxHist = sumHist;
+//                        imList[i].Runners[k].humanID = pre_hb.humanID;
+//                        cv::imshow("hb_R", hb.rectMaskedIm);
+//                        cv::imshow("prehb_R", pre_hb.rectMaskedIm);
+//                    }
+                    cout << maxHist << " " << imList[i].Runners[k].humanID << endl << endl;
+
+                    //関節距離
+//                    float sumDist = 0;
+//                    vector<cv::Point2f> prejoints = pre_hb.getBodyCoord();
+//                    for(int l=0; l < joints.size(); l++){
+//                        if ((l == 0) || ( l== 1) || (l == 2) || (l == 5) || (l == 8)) {
+//                            if ((joints[l] == cv::Point2f(0, 0)) || (prejoints[l] == cv::Point2f(0, 0)))
+//                                continue;
+//                            sumDist += calc2PointDistance(joints[l], prejoints[l]);
+//                            validJointsNum++;
+//                        }
+//                    }
+//                    sumDist/=validJointsNum;
+//                    sumDist - pow(sumHist, 5);
+//                    cout << " sumDist " << sumDist << endl;
+//                    cout << " sumHist " << sumHist << endl;
+//
+//                    if(minDist > sumDist){
+//                        minDist = sumDist;
+//                        imList[i].Runners[k].humanID = pre_hb.humanID;
+//                    }
+                }
+//                cv::waitKey();
+
+//                cout << minDist << endl;
+            }
+            humanID++;
+//            vector<bool> validIDlist(100, false);
+//            for(int k = 0; k < im.Runners.size(); k++){
+//                if(validIDlist[imList[i].Runners[k].humanID] == false){
+//                    validIDlist[imList[i].Runners[k].humanID] = true;
+//                }else{
+//                    for(int l = 0; l < validIDlist.size(); l++){
+//                        if(validIDlist[l] == false){
+//                            validIDlist[l] = true;
+//                            imList[i].Runners[k].humanID = l;
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//            cv::putText(im.image, to_string(imList[i].Runners[k].humanID), im.Runners[k]._body_parts_coord[0],
+//                        cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 255), 1, CV_AA);
+        }
+//        cv::imshow("humanID", im.image);
+//        cv::waitKey();
+        preIm = imList[i];
+    }
+
+
+
+        selectRunnerCandidates();
 //    ofstream opCsvData(_txt_folder + "opData.csv");
 //    for (int i = 0; i < imList.size(); i++) {
 //        ImageInfo im = imList[i];
@@ -92,7 +211,6 @@ void Panorama::trackingRunner(){
 //    }
 
     trackTargetRunner();
-    getOpenPoseMask();
 }
 
 void Panorama::makePanorama(){
@@ -304,6 +422,7 @@ void Panorama::generatePanorama() {
 
     cout << "[Generate panoramic image]" << endl;
 
+    vector<cv::Point2f> headsInAllIm;
     vector<cv::Scalar> colors;
     yagi::setColor(&colors);
 
@@ -361,6 +480,7 @@ void Panorama::generatePanorama() {
         cout << mul_H << endl;
         mycalcWarpedPoint(points, &edge_points, mul_H);
 
+
         //パノラマ画像の更新
         x_min = int(edge_points[0].x < edge_points[2].x ? edge_points[0].x : edge_points[2].x);
         x_max = int(edge_points[1].x > edge_points[3].x ? edge_points[1].x : edge_points[3].x);
@@ -383,13 +503,29 @@ void Panorama::generatePanorama() {
             }
         }
 
+        //頭位置を投影
+        vector<cv::Point2f> heads;
+        for(OpenPoseBody op : im.Runners){
+            heads.push_back(op._body_parts_coord[0]);
+        }
+        vector<cv::Point2f> headsPanorama;
+        mycalcWarpedPoint(heads, &headsPanorama, mul_H);
+
+        for(cv::Point2f pt: headsPanorama){
+            headsInAllIm.push_back(pt);
+        }
+
+        for(cv::Point2f pt: headsInAllIm){
+            cv::circle(PanoramaImage, pt, 2, cv::Scalar(0,0,255), 2);
+        }
+
         //パノラマの途中経過
         cv::Rect rect(0, 0, x_max, y_max);
         cv::Mat smallPanorama(PanoramaImage, rect);
 
         if(SHOW_PANORAMA) {
             cv::Mat smallDummy = smallPanorama.clone();
-            cv::resize(smallDummy, smallDummy, cv::Size(), 0.1, 0.1);
+            cv::resize(smallDummy, smallDummy, cv::Size(), 0.6, 0.6);
             cv::imshow("small panorama", smallDummy);
 //            cv::imshow("im", im.image);
             cv::waitKey(0);
@@ -2547,19 +2683,45 @@ void Panorama::translateImage() {
                         }
                     }
                 }
-                cv::imshow("Translation Result", warpedSrc);
-                cv::waitKey();
+
+
+//                cv::imshow("Translation Result", warpedSrc);
+//                cv::Mat maskedA = maskAofB(imList[frameID].image, imList[frameID].maskimage);
+//                cv::Mat maskedB = maskAofB(imList[frameID - 1].image, imList[frameID - 1].maskimage);
+//                cv::imshow("a", maskedA);
+//                cv::imshow("b", maskedB);
             }
         }
+//
+//        cv::waitKey();
 
         im2 = im1;
     }
 }
 
 void Panorama::getTranslation(){
+    string file_name = _txt_folder + "/translation.txt";
+    if(!checkFileExistence(file_name)) {
 //    this->getTranslationByOpticalFlow();
 //    this->featurePointFindHomography();
-    this->getTranslationByTempMatching();
+//    this->getTranslationByTempMatching();
+        getTranslationByMyTempMatching();
+        //テキストファイル準備
+        ofstream outputfile(file_name);
+        for(ImageInfo im : imList){
+            outputfile << im.translation.x  << " " << im.translation.y  << endl;
+        }
+    }else{
+        string str;
+        ifstream ifs(file_name);
+        int imID = 0;
+        while (getline(ifs, str))
+        {
+            vector<string> words = split(str, ' ');
+            imList[imID].translation = cv::Point2f(stof(words[0]), stof(words[1]));
+        }
+        ifs.close();
+    }
 
     if(SHOW_TRANSLATION)
         this->translateImage();
@@ -2580,6 +2742,84 @@ cv::Mat getResizeHomography(cv::Size panorama, cv::Size smallPanorama){
 
     cv::Mat resize_H = cv::findHomography(src1_panorama_corners, src1_small_panorama_corners, 1);
     return resize_H;
+}
+
+typedef pair<cv::Point2f, int> transSSD;
+typedef pair<cv::Mat, int> ImSSD;
+
+bool pairCompare(const transSSD& firstElof, const transSSD& secondElof)
+{
+    return firstElof.second < secondElof.second;
+}
+bool pairCompareIm(const ImSSD& firstElof, const ImSSD& secondElof)
+{
+    return firstElof.second < secondElof.second;
+}
+
+void Panorama::myTemplateMatching(ImageInfo &im, ImageInfo &preim){
+    cv::Mat tar = im.gray_image;
+    cv::Mat tarMask = im.maskimage;
+    cv::Mat src = preim.gray_image;
+    cv::Mat srcMask = preim.maskimage;
+
+    const int rangeX = 40;
+    const int rangeY = 5;
+
+    vector<transSSD> transSSDVec;
+    vector<ImSSD> imSSDVec;
+    int preSSD = 0;
+
+    for(int Tx = 0; Tx < rangeX; Tx++){
+        for(int Ty = 0; Ty < rangeY; Ty++){
+            int pxNum = 0;
+            int SSD = 0;
+            cv::Mat SSDimg = cv::Mat::zeros(cv::Size(tar.cols - Tx, tar.rows - Ty), CV_8U);
+            for(int x = 0; x < tar.cols - Tx; x++){
+                for(int y = 0; y < tar.rows - Ty; y++){
+                    if((srcMask.at<unsigned char>(y + Ty, x + Tx) == 0) || (tarMask.at<unsigned char>(y, x) == 0))
+                        continue;
+                    SSD += pow(int(src.at<unsigned char>(y + Ty, x + Tx)) - int(tar.at<unsigned char>(y, x)), 2);
+                    int ssdDifValue = ((SSD - preSSD) > 255 ? 255 : (SSD - preSSD));
+                    SSDimg.at<unsigned char>(y, x) = ssdDifValue;
+                    pxNum++;
+                    preSSD = SSD;
+                }
+            }
+            SSD /= pxNum;
+            transSSDVec.push_back(transSSD(cv::Point2f(Tx, Ty), SSD));
+            imSSDVec.push_back(ImSSD(SSDimg, SSD));
+        }
+    }
+
+    sort(transSSDVec.begin(), transSSDVec.end(), pairCompare);
+    sort(imSSDVec.begin(), imSSDVec.end(), pairCompareIm);
+
+    //デバッグ用translation画像保存
+    string imPath = _result_folder + "/template/" + to_string(im.frameID);
+    myMkdir(imPath);
+    for(int i = 0; i < transSSDVec.size(); i++){
+        cv::putText(imSSDVec[i].first, to_string(int(imSSDVec[i].second)), cv::Point2f(550,280),
+                cv::FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(255, 255, 255), 1, CV_AA);
+        cv::imshow("ssd", imSSDVec[i].first);
+        cv::waitKey(1);
+        cv::resize(imSSDVec[i].first,imSSDVec[i].first,cv::Size(), 0.5,0.5);
+        cv::imwrite(imPath + "/image" + to_string(im.frameID) + "_" +
+                            to_string(int(transSSDVec[i].first.x)) + "_" + to_string(int(transSSDVec[i].first.y)) + ".jpg", imSSDVec[i].first);
+    }
+
+    for(int i = 0; i < transSSDVec.size(); i++) {
+        if (yagi::calc2PointDistance(preim.translation, transSSDVec[i].first) < MAX_TRANSLATION) {
+            im.translation = transSSDVec[i].first;
+            cout << im.frameID << " " << transSSDVec[i].second << " " << transSSDVec[i].first << endl;
+            cv::imshow("ssd", imSSDVec[i].first);
+            cv::waitKey(1);
+            cv::imwrite(_result_folder + "/template/" + "/bestTemp/" + "image" + to_string(im.frameID) + "_" +
+                        to_string(int(transSSDVec[i].first.x)) + "_" + to_string(int(transSSDVec[i].first.y)) + ".jpg", imSSDVec[i].first);
+            break;
+        }
+    }
+
+//
 }
 
 

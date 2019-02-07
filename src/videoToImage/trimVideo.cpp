@@ -60,26 +60,45 @@ namespace videoToImage {
         //テキストファイルオープン
         cout << "imageList " << imagelist_path << endl;
         ofstream outputfile(imagelist_path);
+        const int counts = static_cast<int>( cap.get( cv::CAP_PROP_FRAME_COUNT ) );
 
-        while (1) {
+        cv::Mat pre;
+        for(int frameID = 0; frameID < counts; frameID ++) {
             cap >> img; //1フレーム分取り出してimgに保持させる
+            if(img.cols == 0)
+                break;
+            if(pre.cols != 0) {
+                bool f = false;
+                for(int i = 0; i < 300;i++) {
+                    if (img.at<cv::Vec3b>(i, i) != pre.at<cv::Vec3b>(i, i)) {
+                        f = true;
+                        break;
+                    }
+                }
+                if(!f)
+                    continue;
+
+            }
+            pre = img;
+
             resize(img, img, cv::Size(), 640.0/img.cols ,320.0/img.rows);
+
             if (i == 0) {
 
-                cv::imshow("'S' save, 'Q' quit, 'number' *100 frame skip", img);
-                int key = cv::waitKey(0);
+//                cv::imshow("'S' save, 'Q' quit, 'number' *100 frame skip", img);
+                int key = cv::waitKey(1);
 
-                if (key == 's') {
-                    cout << "This frame was saved!" << endl;
+//                if (key == 's') {
+//                    cout << "This frame was saved!" << endl;
                     string number = yagi::digitString(frame_counter++, 4);
 
-                    //画像保存
-                    string image_file_name;
-                    image_file_name = image_folder + "/image" + number + ".jpg";
-                    cv::imwrite(image_file_name, img);
-                    outputfile << image_file_name << endl;
+                //画像保存
+                string image_file_name;
+                image_file_name = image_folder + "/image" + number + ".jpg";
+                cv::imwrite(image_file_name, img);
+                outputfile << image_file_name << endl;
 //                    writer.operator<<(img);
-                }
+//                }
 
                 if (key == '0') {
                     cout << "30frame skipped" << endl;

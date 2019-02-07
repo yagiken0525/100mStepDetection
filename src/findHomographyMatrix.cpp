@@ -69,6 +69,8 @@ cv::Mat getHscaleImage(cv::Mat& im) {
 cv::Point2f Panorama::templateMatching(cv::Mat& im1, cv::Mat& im2, cv::Rect tempRect, cv::Mat& maskImage, cv::Point2f preTranslation, const int frameID) {
     cv::Mat templateImg(im1, tempRect);
     cv::Mat templateMask(maskImage, tempRect);
+    cv::imshow("a", templateImg);
+    cv::imshow("aaa", templateMask);
 
     //テンプレートマッチング
     cv::Mat tempResult;
@@ -101,7 +103,7 @@ cv::Point2f Panorama::templateMatching(cv::Mat& im1, cv::Mat& im2, cv::Rect temp
         imList[frameID].translationList.push_back(translation);
         mask.at<unsigned char>(max_pt) = 0;
     }
-
+    cv::waitKey(1);
     return imList[frameID].translationList[0];
 }
 
@@ -117,6 +119,20 @@ void Panorama::showOnlinePoints(ImageInfo& im){
     cv::waitKey();
 }
 
+void Panorama::getTranslationByMyTempMatching() {
+    string tmpImPath = _result_folder + "/template/";
+    myMkdir(tmpImPath);
+    string bestPath = tmpImPath + "/bestTemp/";
+    myMkdir(bestPath);
+
+    for (int frameID = 0; frameID < imList.size(); frameID++) {
+        if(frameID == 0){
+            imList[frameID].translation = cv::Point2f(0,0);
+        }else {
+            myTemplateMatching(imList[frameID], imList[frameID - 1]);
+        }
+    }
+}
 
 void Panorama::getTranslationByTempMatching() {
 
@@ -140,10 +156,23 @@ void Panorama::getTranslationByTempMatching() {
         if(frameID == 0){
             translation = cv::Point2f(0,0);
         }else {
-            cv::Mat im1H = imList[frameID].gray_image;
-            cv::Mat im2H = imList[frameID - 1].gray_image;
-            cv::bitwise_and(imList[frameID].maskimage, imList[frameID].trackAreaMask, imList[frameID].maskimage);
-            translation = templateMatching(im1H, im2H, tempRect, imList[frameID].maskimage, preTranslation, frameID);
+            //hsvスケール
+            cv::Mat channel[3];
+            cv::split(im1, channel);
+            cv::Mat im1H = channel[0].clone();
+
+            cv::split(im2, channel);
+            cv::Mat im2H = channel[0].clone();
+
+//            cv::Mat im1H = yagi::maskAofB(im1, imList[frameID].trackAreaMask);
+//            cv::Mat im2H = yagi::maskAofB(im2, imList[frameID].trackAreaMask);
+            cv::imshow("a", im1H);
+            cv::imshow("b", im2H);
+            cv::waitKey();
+
+//            cv::bitwise_and(imList[frameID].maskimage, imList[frameID].trackAreaMask, imList[frameID].maskimage);
+//            cv::imshow("b", imList[frameID].maskimage);
+//            translation = templateMatching(im1, im2, tempRect, imList[frameID].maskimage, preTranslation, frameID);
         }
         frame_num++;
         im2 = im1;
@@ -151,7 +180,7 @@ void Panorama::getTranslationByTempMatching() {
         imList[frameID].translation = translation;
         sumTranslation += translation.x;
 
-        translationTxt << sumTranslation << endl;
+        translationTxt << translation.x << endl;
     }
     cv::destroyAllWindows();
     cout << "[calculate translation by template matching finished]" << endl;
@@ -303,13 +332,13 @@ void Panorama::getTranslationByBatchTempMatching() {
 
 
 
-void Panorama::obtainOnlinePointsAsIm1(ImageInfo& im){
+void Panorama::obtainOnlinePointsAsIm1(ImageInfo& im, cv::Point2f translation){
     CV_Assert(im.grads.size() == im.segments.size());
     for (int ptID = 0; ptID < im.grads.size(); ptID++) {
         float a = im.grads[ptID];
         float b = im.segments[ptID];
 
-        cv::Point2f prev1(im.translation.x, a * (im.translation.x) + b);
+        cv::Point2f prev1(translation.x, a * (translation.x) + b);
         cv::Point2f prev2(im.image.cols, (a * im.image.cols) + b);
 
         im.prev_keypoints.push_back(prev1);
@@ -368,7 +397,7 @@ void Panorama::getHomographyFromTranslation(){
             im2 = im1;
         }else {
             ImageInfo& preIm = imList[frameID - 1];
-            obtainOnlinePointsAsIm1(preIm);
+            obtainOnlinePointsAsIm1(preIm, im.translation);
             obtainOnlinePointsAsIm2(im);
             if(SHOW_ONLINE_POINTS)
                 showOnlinePoints(im);
@@ -376,8 +405,10 @@ void Panorama::getHomographyFromTranslation(){
                                                    CV_RANSAC, 1.0);
         }
         imList[frameID].H = H;
-        if(SHOW_HOMOGRAPHY)
+        if(SHOW_HOMOGRAPHY) {
+            cout << imList[frameID].translation << endl;
             showHomographyWarpingResult(im1, im2, H);
+        }
         im2 = im1;
     }
 }

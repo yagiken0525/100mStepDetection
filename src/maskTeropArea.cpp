@@ -77,7 +77,7 @@ void Panorama::selectMaskArea() {
     string file_name = _txt_folder + "/maskArea.txt";
 
     //テキストファイルからマスク領域を入力
-    if (this->USE_LASTMASK){
+    if (checkFileExistence(file_name)){
         std::ifstream ifs(file_name);
         std::string str;
 

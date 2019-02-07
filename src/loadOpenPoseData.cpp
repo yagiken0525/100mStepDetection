@@ -10,52 +10,122 @@ using namespace std;
 using namespace yagi;
 using namespace cv;
 
+//最小座標を求める
+cv::Point minPoint(vector<cv::Point> contours){
+    double minx = contours.at(0).x;
+    double miny = contours.at(0).y;
+    for(int i=1;i<contours.size(); i++){
+        if(minx > contours.at(i).x){
+            minx = contours.at(i).x;
+        }
+        if(miny > contours.at(i).y){
+            miny = contours.at(i).y;
+        }
+    }
+    return cv::Point(minx, miny);
+}
+
+
+//最大座標を求める
+cv::Point maxPoint(vector<cv::Point> contours){
+    double maxx = contours.at(0).x;
+    double maxy = contours.at(0).y;
+    for(int i=1;i<contours.size(); i++){
+        if(maxx < contours.at(i).x){
+            maxx = contours.at(i).x;
+        }
+        if(maxy < contours.at(i).y){
+            maxy = contours.at(i).y;
+        }
+    }
+    return cv::Point(maxx, maxy);
+}
+
+cv::Rect calcRectOfMask(cv::Mat mask){
+    std::vector<std::vector<cv::Point>> contours;
+    std::vector<cv::Vec4i> hierarchy;
+    cv::findContours(mask, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_TC89_L1);
+
+    int maxSize = 0;
+    int maxID = 0;
+    for(int i = 0; i < contours.size(); i++){
+        if(maxSize < contours[i].size()){
+            maxSize = int(contours[i].size());
+            maxID = i;
+        }
+    }
+    cv::Point minP = minPoint(contours.at(maxID) );
+    cv::Point maxP = maxPoint(contours.at(maxID) );
+    cv::Rect resultRect(minP, maxP);
+    return resultRect;
+}
+
 //OpenPoseのデータ読みこみ
 void Panorama::detectHumanArea() {
     cout << "[Detect human area]" << endl;
     ifstream ifs(_openpose_list_path);
     string line;
     OpenPoseBody runner;
-    vector<OpenPoseBody> runners;
-    vector<cv::Point2f> pre_centers;
-
-    bool first_runner = true;
-    int frame_counter = 0;
-
+//    vector<OpenPoseBody> runners;
+    int frameID = 0;
     while (getline(ifs, line)) {
-
         vector<string> coords = split(line, ' ');
-
-        if (coords.size() == 5) {
-
-            if (!first_runner) {
-
-                OpenPoseBody dummy_runner = runner;
-                runners.push_back(dummy_runner);
-                runner.clearBodyCoord();
-
-                if (coords[1] == "0") {
-                    vector<OpenPoseBody> dummy_runners = runners;
-                    allRunners.push_back(dummy_runners);
-
-                    runners.clear();
-                    frame_counter++;
-                }
-            }
-        } else {
-            runner.setBodyCoord(coords);
-            runner.mask_rect = getMaskRect(runner._body_parts_coord);
-            first_runner = false;
-        }
-
-        if (frame_counter == imList.size()) {
-            break;
+        if (coords[0] == "Frame:") {
+            frameID++;
+        }else if(coords[0] == "Person"){
+            runner.clearBodyCoord();
+        }else if(coords[0] == "end"){
+            this->imList[frameID - 1].Runners.push_back(runner);
+        }else{
+            cv::Point2f pt(stof(coords[0]), stof(coords[1]));
+            float conf = stof(coords[2]);
+            runner._body_parts_coord.push_back(pt);
+            runner._confidenceMap.push_back(conf);
         }
     }
 
-    for (int i = 0; i < allRunners.size(); i++) {
-        imList[i].Runners = allRunners[i];
-    }
+//
+//    OpenPoseBody runner;
+//    vector<OpenPoseBody> runners;
+//    vector<cv::Point2f> pre_centers;
+//
+//    bool first_runner = true;
+//    int frame_counter = 0;
+//
+//    while (getline(ifs, line)) {
+//
+//        vector<string> coords = split(line, ' ');
+//
+//        if (coords.size() == 5) {
+//
+//            if (!first_runner) {
+//
+//                OpenPoseBody dummy_runner = runner;
+//                runners.push_back(dummy_runner);
+//                runner.clearBodyCoord();
+//
+//                if (coords[1] == "0") {
+//                    vector<OpenPoseBody> dummy_runners = runners;
+//                    allRunners.push_back(dummy_runners);
+//
+//                    runners.clear();
+//                    frame_counter++;
+//                }
+//            }
+//        } else {
+//            runner.setBodyCoord(coords);
+//            runner.mask_rect = getMaskRect(runner._body_parts_coord);
+//            first_runner = false;
+//        }
+//
+//        if (frame_counter == imList.size()) {
+//            break;
+//        }
+//    }
+//
+//    for (int i = 0; i < allRunners.size(); i++) {
+//        imList[i].Runners = allRunners[i];
+//    }
 
     cout << "[Detect human area finished]" << endl;
 }
@@ -80,7 +150,9 @@ cv::Mat Panorama::calcOpenPoseMask(vector<cv::Point2f>& pts, cv::Size imSize){
     cv::Mat mask = cv::Mat::zeros(imSize, CV_8U);
     cv::Scalar WHITE(255,255,255);
     for(cv::Point2f pt: pts){
-        cv::circle(mask, pt, OP_MASK_RADIUS, WHITE, -1, CV_AA);
+        if(pt.x != 0.0) {
+            cv::circle(mask, pt, OP_MASK_RADIUS, WHITE, -1, CV_AA);
+        }
     }
     cv::morphologyEx(mask, mask, MORPH_CLOSE, 2);
     return mask;
@@ -118,73 +190,128 @@ cv::Mat myGraphCut(cv::Mat& image, cv::Mat& result, cv::Rect rectangle, const in
 
     return foreground;
 }
+//
+////最小座標を求める
+//cv::Point minPoint(vector<cv::Point> contours){
+//    double minx = contours.at(0).x;
+//    double miny = contours.at(0).y;
+//    for(int i=1;i<contours.size(); i++){
+//        if(minx > contours.at(i).x){
+//            minx = contours.at(i).x;
+//        }
+//        if(miny > contours.at(i).y){
+//            miny = contours.at(i).y;
+//        }
+//    }
+//    return cv::Point(minx, miny);
+//}
+////最大座標を求める
+//cv::Point maxPoint(vector<cv::Point> contours){
+//    double maxx = contours.at(0).x;
+//    double maxy = contours.at(0).y;
+//    for(int i=1;i<contours.size(); i++){
+//        if(maxx < contours.at(i).x){
+//            maxx = contours.at(i).x;
+//        }
+//        if(maxy < contours.at(i).y){
+//            maxy = contours.at(i).y;
+//        }
+//    }
+//    return cv::Point(maxx, maxy);
+//}
 
 void Panorama::getOpenPoseMask(){
     for(int imID = 0; imID < imList.size(); imID++){
-        vector<OpenPoseBody>& ops = imList[imID].runnerCandidate;
+        vector<OpenPoseBody>& ops = imList[imID].Runners;
         for(int opID = 0; opID < ops.size(); opID++){
             OpenPoseBody& hb = ops[opID];
             cv::Mat openPoseMask = calcOpenPoseMask(hb._body_parts_coord, cv::Size(IMG_WIDTH, IMG_HEIGHT));
             hb.openPoseMask = openPoseMask;
             cv::Mat roughMasked = yagi::maskAofB(imList[imID].image, hb.openPoseMask);
             hb.opMaskedImage = roughMasked;
+            hb.mask_rect = calcRectOfMask(openPoseMask);
+//            cv::imshow("aa", imList[imID].maskimage );
 
-//            if(ops[opID].humanID == 1){
-//                for(int i = 0; i < imList[imID].grads.size(); i++){
-//                }
-//            }
+            cv::Mat img_not;
+            bitwise_not(openPoseMask, img_not);
+            imList[imID].maskimage = maskAofB( img_not, imList[imID].maskimage);
+
+            //トラックラインマスク
+            for(int i = 0; i < imList[imID].track_line_masks.size(); i++) {
+                cv::Mat img_not;
+                bitwise_not(imList[imID].track_line_masks[i], img_not);
+                imList[imID].maskimage = maskAofB( img_not, imList[imID].maskimage);
+            }
+
+
+            cv::Mat rectMaskedIm(imList[imID].image, hb.mask_rect);
+            cv::Mat rectMask(openPoseMask, hb.mask_rect);
+            cv::resize(rectMaskedIm, rectMaskedIm, cv::Size(), 100.0/rectMaskedIm.cols, 100.0/rectMaskedIm.rows);
+            cv::resize(rectMask, rectMask, cv::Size(), 100.0/rectMask.cols, 100.0/rectMask.rows);
+            hb.rectMaskedIm = rectMaskedIm;
+
+            //test トラッキングのために色ヒストグラムを取得
+            cv::Mat histR, histG, histB, frame;
+            cv::Mat channel[3];
+            cv::split(rectMaskedIm, channel);
+
+            cv::Mat graphR = drawHist(channel[0], rectMaskedIm, rectMask, histR);
+            cv::Mat graphG = drawHist(channel[1], rectMaskedIm, rectMask, histG);
+            cv::Mat graphB = drawHist(channel[2], rectMaskedIm, rectMask, histB);
+            hb.histChannel.push_back(histR);
+            hb.histChannel.push_back(histG);
+            hb.histChannel.push_back(histB);
+            hb.histGraph.push_back(graphR);
+            hb.histGraph.push_back(graphG);
+            hb.histGraph.push_back(graphB);
+
+////        test トラッキングのために足関節と直線の距離を算出
+            int ptID = 0;
+            cv::Point2f rFoot(0,0);
+            int rFootNum = 0;
+            cv::Point2f lFoot(0,0);
+            int lFootNum = 0;
+
+            for(cv::Point2f pt: hb._body_parts_coord) {
+                //右足左足の重心を出す
+                if(pt != cv::Point2f(0,0)) {
+                    if ((ptID == 19) || (ptID == 20) || (ptID == 21)) {
+                        rFoot.x += pt.x;
+                        rFoot.y += pt.y;
+                        rFootNum++;
+                    } else if (ptID == 22 || ptID == 23 || ptID == 24) {
+                        lFoot.x += pt.x;
+                        lFoot.y += pt.y;
+                        lFootNum++;
+                    }
+                }
+                ptID++;
+            }
+            rFoot.x/=rFootNum;
+            lFoot.x/=lFootNum;
+            rFoot.y/=rFootNum;
+            lFoot.y/=lFootNum;
+//            cv::circle(imList[imID].image, rFoot, 2, cv::Scalar(255,0,0), 2);
+//            cv::circle(imList[imID].image, lFoot, 2, cv::Scalar(255,0,0), 2);
+//            cv::imshow("a", imList[imID].image);
+//            cv::waitKey();
+
+            hb.rFoot = rFoot;
+            hb.lFoot = lFoot;
+//            float rdist = yagi::distPoint2Line(rFoot, imList[imID].grads[0], imList[imID].segments[0]);
+//            float ldist = yagi::distPoint2Line(lFoot, imList[imID].grads[0], imList[imID].segments[0]);
+//            cv::putText(imList[imID].image, to_string(int(dist)), pt, 0.5, 0.5, cv::Scalar(255, 0, 0), 2);
+
         }
+//        cv::Mat maskIm = maskAofB(imList[imID].image, );
+
+//        cv::imshow("a", imList[imID].maskimage );
+//        cv::waitKey();
+
     }
 }
 
-//最小座標を求める
-cv::Point minPoint(vector<cv::Point> contours){
-    double minx = contours.at(0).x;
-    double miny = contours.at(0).y;
-    for(int i=1;i<contours.size(); i++){
-        if(minx > contours.at(i).x){
-            minx = contours.at(i).x;
-        }
-        if(miny > contours.at(i).y){
-            miny = contours.at(i).y;
-        }
-    }
-    return cv::Point(minx, miny);
-}
 
-//最大座標を求める
-cv::Point maxPoint(vector<cv::Point> contours){
-    double maxx = contours.at(0).x;
-    double maxy = contours.at(0).y;
-    for(int i=1;i<contours.size(); i++){
-        if(maxx < contours.at(i).x){
-            maxx = contours.at(i).x;
-        }
-        if(maxy < contours.at(i).y){
-            maxy = contours.at(i).y;
-        }
-    }
-    return cv::Point(maxx, maxy);
-}
-
-cv::Rect calcRectOfMask(cv::Mat mask){
-    std::vector<std::vector<cv::Point>> contours;
-    std::vector<cv::Vec4i> hierarchy;
-    cv::findContours(mask, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_TC89_L1);
-
-    int maxSize = 0;
-    int maxID = 0;
-    for(int i = 0; i < contours.size(); i++){
-        if(maxSize < contours[i].size()){
-            maxSize = int(contours[i].size());
-            maxID = i;
-        }
-    }
-    cv::Point minP = minPoint(contours.at(maxID) );
-    cv::Point maxP = maxPoint(contours.at(maxID) );
-    cv::Rect resultRect(minP, maxP);
-    return resultRect;
-}
 
 void Panorama::maskingRunners(){
     for(ImageInfo im : imList){
@@ -206,14 +333,14 @@ void Panorama::maskHumanArea() {
     cout << "[Mask human area]" << endl;
 
     for (auto itr_frame = imList.begin(); itr_frame != imList.end(); ++itr_frame) {
-        std::vector<OpenPoseBody> runnersInFrame = itr_frame->Runners;
+//        std::vector<OpenPoseBody> runnersInFrame = itr_frame->Runners;
         std::vector<MaskArea> mask_in_frame;
-
-        for (auto itr_runner = runnersInFrame.begin(); itr_runner != runnersInFrame.end(); ++itr_runner) {
-            MaskArea area;
-            area._mask_area = getMaskRect(itr_runner->_body_parts_coord);
-            mask_in_frame.push_back(area);
-        }
+//
+//        for (auto itr_runner = runnersInFrame.begin(); itr_runner != runnersInFrame.end(); ++itr_runner) {
+//            MaskArea area;
+//            area._mask_area = getMaskRect(itr_runner->_body_parts_coord);
+//            mask_in_frame.push_back(area);
+//        }
 
         for (auto itr = mask_areas.begin(); itr != mask_areas.end(); ++itr) {
             mask_in_frame.push_back(*itr);

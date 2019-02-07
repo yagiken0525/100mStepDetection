@@ -48,7 +48,7 @@ void Panorama::startFinishLineSelect() {
     cv::setMouseCallback(windowName, myrunnerCallBackFunc, &mouseEvent);
     cv::Mat image = imList[0].image.clone();
 
-    if (!USE_LAST_CORNERS) {
+    if (!checkFileExistence(file_name)) {
         while (1) {
             cv::imshow(windowName, image);
             int key = cv::waitKey(1);

@@ -65,7 +65,7 @@ void Panorama::selectTrack() {
     string click_file_name = _txt_folder + "/trackLineDetection.txt";
 
     //クリックするためのループ
-    if (this->USE_LAST_TRACKLINE == false) {
+    if (!checkFileExistence(click_file_name)) {
         ofstream outputfile(click_file_name);
         while (1) {
             int key = cv::waitKey(1);
@@ -153,7 +153,7 @@ void Panorama::trackTracking() {
 
             //求めた直線周辺をマスク
             cv::Mat line_mask = cv::Mat::zeros(edge.size(), CV_8U);
-            drawLine(line_mask, pt1, pt2, 10, WHITE);
+            drawLine(line_mask, pt1, pt2, 7, WHITE);
             imList[i].track_line_masks.push_back(line_mask);
 
             //直線の方程式求める

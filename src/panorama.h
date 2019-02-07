@@ -61,6 +61,7 @@ namespace yagi {
         void videotoImage();
         cv::Point2f templateMatching(cv::Mat& im1, cv::Mat& im2, cv::Rect tempRect, cv::Mat& maskImage, cv::Point2f preTranslation,  const int frameID);
         void getTranslationByTempMatching();
+        void getTranslationByMyTempMatching();
         void getTranslationByBatchTempMatching();
         void getTranslationByOpticalFlow();
         void featurePointFindHomography();
@@ -163,6 +164,7 @@ namespace yagi {
 
         void getHomographyFromTranslation();
 
+
         void getTranslation();
 
         void translateImage();
@@ -196,6 +198,7 @@ namespace yagi {
             void setBodyCoord(std::vector<std::string> coord);
             std::vector<cv::Point2f> getBodyCoord();
             void clearBodyCoord();
+            void setMaskRect();
 
             //Variables
             cv::Rect mask_rect;
@@ -204,6 +207,12 @@ namespace yagi {
             std::vector<float> _confidenceMap;
             cv::Mat openPoseMask;
             cv::Mat opMaskedImage;
+            std::vector<cv::Mat> histChannel;
+            std::vector<cv::Mat> histGraph;
+            cv::Point2f rFoot;
+            cv::Point2f lFoot;
+            cv::Mat rectMaskedIm;
+            float outLineDist;
         };
 
         //Step
@@ -272,6 +281,7 @@ namespace yagi {
             cv::Mat gray_image;
             cv::Mat hsv_image;
             cv::Mat edge;
+            cv::Mat edge_horizontal;
             cv::Mat panorama_scale_im;
             cv::Mat trackLineImage;
             cv::Mat trackLineAndOpenPoseImage;
@@ -309,6 +319,7 @@ namespace yagi {
             bool Rstep = false;
             bool Lstep = false;
             bool stepPoint = false;
+            int frameID;
 
             //Strobo
             cv::Mat stroboH;
@@ -337,8 +348,9 @@ namespace yagi {
 
         void showOnlinePoints(ImageInfo &im);
 
-        void obtainOnlinePointsAsIm1(ImageInfo& im);
+        void obtainOnlinePointsAsIm1(ImageInfo& im, cv::Point2f translation);
         void obtainOnlinePointsAsIm2(ImageInfo& im);
+        void myTemplateMatching(ImageInfo &im, ImageInfo &preim);
 
     private:
         //Panorama

@@ -92,48 +92,60 @@ void yagi::outputTextFromVideo(const std::string video_path, const std::string i
         printf("directory already exists\n");
     }
 
+    //エッジ強調
+    const float k = -1.0;
+    Mat sharpningKernel4 = Mat::zeros(3,3,CV_32F);(Mat_<float>(3, 3) << 0.0, k, 0.0, k, 5.0, k, 0.0, k, 0.0);
+    sharpningKernel4.at<float>(0,1) = k;
+    sharpningKernel4.at<float>(1,0) = k;
+    sharpningKernel4.at<float>(1,1) = 5.0;
+    sharpningKernel4.at<float>(1,2) = k;
+    sharpningKernel4.at<float>(2,1) = k;
+
+//    Mat sharpningKernel8 = (Mat_<float>(3, 3) << k, k, k, k, 9.0, k, k, k, k);
+
+
     // Process and display image
+    bool personFound = false;
     int max_frame=cap.get(CV_CAP_PROP_FRAME_COUNT); //フレーム数
-    for(int i=0; i<max_frame;i++){ ; //1フレーム分取り出してimgに保持させる
+    for(int i=0; i<max_frame ;i++){ ; //1フレーム分取り出してimgに保持させる
         cap>>img ; //1フレーム分取り出してimgに保持させる
-        cv::resize(img,img,Size(), 640.0/img.cols, 320.0/img.rows);
+        if(img.cols == 0)
+            break;
 
-        //cv::Mat dummy = cv::Mat::zeros(img.cols, img.rows * (img.), CV_32FC3);
+             // 先鋭化フィルタを適用する
+//            cv::filter2D(img, img, img.depth(), sharpningKernel4);
+            cv::resize(img, img, Size(), 640.0 / img.cols, 320.0 / img.rows);
+            //cv::Mat dummy = cv::Mat::zeros(img.cols, img.rows * (img.), CV_32FC3);
 
-        auto datumProcessed = opWrapper.emplaceAndPop(img);
-        if (datumProcessed != nullptr)
-        {
+            auto datumProcessed = opWrapper.emplaceAndPop(img);
+            if (datumProcessed != nullptr) {
 //            printKeypoints(datumProcessed);
-            if (datumProcessed != nullptr && !datumProcessed->empty())
-            {
-                // // Alternative 3
-//                std::cout << i << std::endl;
-//                std::cout << "a " << datumProcessed->at(0).poseKeypoints.getNumberDimensions() << std::endl;
-//                std::cout << "b " << datumProcessed->at(0).poseKeypoints.getVolume() << std::endl;
-//                std::cout << "c " << datumProcessed->at(0).poseKeypoints.getSize().size()<< std::endl;
-//                std::cout << "d " << datumProcessed->at(0).poseKeypoints << std::endl;
-//                outputfile << "Frame: " << i << endl;
-                int elem_num = datumProcessed->at(0).poseKeypoints.getVolume();
-                for (int j = 0; j < elem_num; j++){
-                    if(j % 75 == 0){
-                        outputfile << "Person " << (j/75) << " (x, y, score):" << endl;
-                    }
-                    outputfile << datumProcessed->at(0).poseKeypoints[j] << " ";
-                    if(j % 3 == 2){
-                        outputfile << endl;
-                    }
-                }
+                if (datumProcessed != nullptr && !datumProcessed->empty()) {
+                    outputfile << "Frame: " << i << endl;
+                    personFound = false;
+                    int elem_num = datumProcessed->at(0).poseKeypoints.getVolume();
+                    for (int j = 0; j < elem_num; j++) {
+                        if (j % 75 == 0) {
+                            outputfile << "Person " << (j / 75) << " (x, y, score):" << endl;
+                        }
+                        outputfile << datumProcessed->at(0).poseKeypoints[j] << " ";
+                        if (j % 75 == 74) {
+                            outputfile << endl << "end";
+                        }
 
-            }
-            else
-                op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+                        if (j % 3 == 2) {
+                            outputfile << endl;
+                        }
+                    }
 
-            display(datumProcessed);
-            cv::imwrite(image_output_path + yagi::digitString(i, 4) + ".jpg", datumProcessed->at(0).cvOutputData);
-            imageoutputfile << image_output_path + yagi::digitString(i,4) + ".jpg" << endl;
-        }
-        else
-            op::log("Image could not be processed.", op::Priority::High);
+                } else
+                    op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+
+                display(datumProcessed);
+                cv::imwrite(image_output_path + yagi::digitString(i, 4) + ".jpg", datumProcessed->at(0).cvOutputData);
+                imageoutputfile << image_output_path + yagi::digitString(i, 4) + ".jpg" << endl;
+            } else
+                op::log("Image could not be processed.", op::Priority::High);
 
     }
 

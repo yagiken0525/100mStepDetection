@@ -48,22 +48,30 @@ void Panorama::loadImage() {
         cv::Mat edge = cv::Mat::zeros(gray_image.size(), CV_8UC1);
         for (int i = 1; i < gray_image.rows; i ++){
             for (int j = 0; j < gray_image.cols; j ++){
-                if ((gray_image.at<unsigned char>(i, j) - gray_image.at<unsigned char>(i - 1, j)) > 40){
+                if ((gray_image.at<unsigned char>(i, j) - gray_image.at<unsigned char>(i - 1, j)) > 30){
                     edge.at<unsigned char>(i, j) = 255;
                 }
             }
         }
 
-//        cv::imshow("edge", gray_image);
-//        cv::imshow("oedge", preEdge);
-//        cv::waitKey(0);
+        //エッジ画像（横方向微分）
+        /// Generate grad_x and grad_y
+        int scale = 1;
+        int delta = 0;
+        int ddepth = CV_8U;
+        cv::Mat grad_x;
+        cv::Mat abs_grad_x, abs_grad_y;
+        cv::Sobel(gray_image, grad_x, ddepth, 1, 0, 3, scale, delta, cv::BORDER_DEFAULT );
+        cv::convertScaleAbs( grad_x, abs_grad_x );
 
-        //画像格納
+
         image_info.image = image;
         image_info.gray_image = gray_image;
         image_info.hsv_image = img_hsv;
         image_info.edge = edge;
+        image_info.edge_horizontal = grad_x;
         image_info.trackLineAndOpenPoseImage = cv::Mat::zeros(image.size(), CV_8UC3);
+        image_info.frameID = line_counter;
         preEdge = gray_image;
 
         //DensePoseのマスク
@@ -76,7 +84,7 @@ void Panorama::loadImage() {
 
         //デバック
         if (SHOW_LOADED_IMAGE) {
-            cv::imshow("color", image);
+            cv::imshow("color", edge);
 //            cv::imshow("gray", gray_image);
             cout << "Frame: " << line_counter << endl;
             cv::waitKey(0);

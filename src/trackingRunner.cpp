@@ -74,8 +74,9 @@ void Panorama::trackTargetRunner() {
         cv::Point2f minPt;
         OpenPoseBody minHb;
         cv::Mat dum = im.image.clone();
-        for (OpenPoseBody hb: im.runnerCandidate) {
+        cout << im.runnerCandidate.size() << endl;
 
+        for (OpenPoseBody hb: im.runnerCandidate) {
             vector<cv::Point2f> bodyCoords = hb.getBodyCoord();
             if (target_found == false) {
                 for (int i = 0; i < bodyCoords.size(); i++) {
@@ -131,7 +132,7 @@ void Panorama::trackTargetRunner() {
 
         frameID++;
 //        cv::imshow("targetRunner", im.image);
-//        cv::waitKey(10);
+//        cv::waitKey(0);
 
         if (frameID == (imList.size() - 1))
             break;
