@@ -22,6 +22,7 @@
     <list default="true" id="68893670-619a-4ba5-bd85-2b2914098cda" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/basicFunctions" afterPath="$PROJECT_DIR$/src/basicFunctions" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.cpp" afterPath="$PROJECT_DIR$/main.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/openpose/exportHumanPoseTxt.cpp" afterPath="$PROJECT_DIR$/src/openpose/exportHumanPoseTxt.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/panorama.cpp" afterPath="$PROJECT_DIR$/src/panorama.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/panorama.h" afterPath="$PROJECT_DIR$/src/panorama.h" />
     </list>
@@ -35,11 +36,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="main.cpp" pinned="false" current-in-tab="true">
+      <file leaf-file-name="main.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="320">
-              <caret line="68" column="28" lean-forward="true" selection-start-line="68" selection-start-column="28" selection-end-line="68" selection-end-column="28" />
+            <state relative-caret-position="337">
+              <caret line="70" column="20" lean-forward="true" selection-start-line="70" selection-start-column="20" selection-end-line="70" selection-end-column="20" />
               <folding>
                 <element signature="e#102#131#0" expanded="true" />
               </folding>
@@ -47,31 +48,18 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="homography.txt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/projects/2009_London/texts/homography.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-187">
-              <caret line="10" column="91" lean-forward="true" selection-start-line="10" selection-start-column="91" selection-end-line="10" selection-end-column="91" />
-              <folding />
-            </state>
+      <file leaf-file-name="0001.jpg" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/projects/2017_London/openpose_image/0001.jpg">
+          <provider selected="true" editor-type-id="images">
+            <state />
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="string_conversions.h" pinned="false" current-in-tab="false">
-        <entry file="file:///usr/include/c++/4.8/ext/string_conversions.h">
+      <file leaf-file-name="types.hpp" pinned="false" current-in-tab="false">
+        <entry file="file:///usr/local/include/opencv2/core/types.hpp">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="189">
-              <caret line="61" column="0" lean-forward="false" selection-start-line="61" selection-start-column="0" selection-end-line="61" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="basic_string.h" pinned="false" current-in-tab="false">
-        <entry file="file:///usr/include/c++/4.8/bits/basic_string.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="189">
-              <caret line="2853" column="0" lean-forward="false" selection-start-line="2853" selection-start-column="0" selection-end-line="2853" selection-end-column="0" />
+              <caret line="1176" column="0" lean-forward="false" selection-start-line="1176" selection-start-column="0" selection-end-line="1176" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -80,18 +68,18 @@
       <file leaf-file-name="loadOpenPoseData.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/loadOpenPoseData.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="244" column="0" lean-forward="false" selection-start-line="244" selection-start-column="0" selection-end-line="244" selection-end-column="0" />
+            <state relative-caret-position="344">
+              <caret line="221" column="0" lean-forward="true" selection-start-line="221" selection-start-column="0" selection-end-line="221" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="panorama.cpp" pinned="false" current-in-tab="false">
+      <file leaf-file-name="panorama.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/panorama.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="463" column="64" lean-forward="true" selection-start-line="463" selection-start-column="64" selection-end-line="463" selection-end-column="64" />
+            <state relative-caret-position="340">
+              <caret line="171" column="74" lean-forward="true" selection-start-line="171" selection-start-column="74" selection-end-line="171" selection-end-column="74" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
               </folding>
@@ -99,31 +87,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="virtualRace.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/virtualRace.cpp">
+      <file leaf-file-name="new_allocator.h" pinned="false" current-in-tab="false">
+        <entry file="file:///usr/include/c++/4.8/ext/new_allocator.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="35" column="13" lean-forward="false" selection-start-line="30" selection-start-column="11" selection-end-line="35" selection-end-column="13" />
+            <state relative-caret-position="189">
+              <caret line="119" column="0" lean-forward="false" selection-start-line="119" selection-start-column="0" selection-end-line="119" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="basicFunction.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/basicFunctions/basicFunction.h">
+      <file leaf-file-name="alloc_traits.h" pinned="false" current-in-tab="false">
+        <entry file="file:///usr/include/c++/4.8/bits/alloc_traits.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="200">
-              <caret line="80" column="12" lean-forward="false" selection-start-line="80" selection-start-column="12" selection-end-line="80" selection-end-column="12" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="basicFunction.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/basicFunctions/basicFunction.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="291">
-              <caret line="79" column="68" lean-forward="false" selection-start-line="79" selection-start-column="68" selection-end-line="79" selection-end-column="68" />
+            <state relative-caret-position="189">
+              <caret line="253" column="0" lean-forward="false" selection-start-line="253" selection-start-column="0" selection-end-line="253" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -132,8 +110,25 @@
       <file leaf-file-name="stl_vector.h" pinned="false" current-in-tab="false">
         <entry file="file:///usr/include/c++/4.8/bits/stl_vector.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="291">
-              <caret line="247" column="6" lean-forward="false" selection-start-line="247" selection-start-column="6" selection-end-line="247" selection-end-column="6" />
+            <state relative-caret-position="189">
+              <caret line="311" column="0" lean-forward="false" selection-start-line="311" selection-start-column="0" selection-end-line="311" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="0000.jpg" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/projects/2016_Rio/openpose_image/0000.jpg">
+          <provider selected="true" editor-type-id="images">
+            <state />
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="panorama.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/panorama.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="265">
+              <caret line="200" column="31" lean-forward="false" selection-start-line="200" selection-start-column="31" selection-end-line="200" selection-end-column="31" />
               <folding />
             </state>
           </provider>
@@ -143,10 +138,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>pano.</find>
-      <find>_human_area_list</find>
-      <find>inputImage</find>
-      <find>../images</find>
       <find>Rio100m</find>
       <find>basicFunction/</find>
       <find>clicked_point</find>
@@ -170,9 +161,13 @@
       <find>this</find>
       <find>transformPanoramaTopview</find>
       <find>click</find>
-      <find>check</find>
       <find>line</find>
       <find>ifst</find>
+      <find>numer</find>
+      <find>imID</find>
+      <find>check</find>
+      <find>trackingList</find>
+      <find>TRACKING_MIN_DIST</find>
     </findStrings>
     <replaceStrings>
       <replace>_image_list_path</replace>
@@ -193,6 +188,8 @@
       <replace>this</replace>
       <replace>trackingUsingHead</replace>
       <replace>prev</replace>
+      <replace>opID</replace>
+      <replace>trackerList</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -218,12 +215,12 @@
         <option value="$PROJECT_DIR$/src/basicFunctions/basicFunction.cpp" />
         <option value="$PROJECT_DIR$/src/basicFunctions/basicFunction.h" />
         <option value="$PROJECT_DIR$/src/loadImage.cpp" />
-        <option value="$PROJECT_DIR$/src/panorama.h" />
         <option value="$PROJECT_DIR$/src/maskTeropArea.cpp" />
         <option value="$PROJECT_DIR$/src/findHomographyMatrix.cpp" />
-        <option value="$PROJECT_DIR$/src/openpose/exportHumanPoseTxt.cpp" />
         <option value="$PROJECT_DIR$/src/videoToImage/trimVideo.cpp" />
+        <option value="$PROJECT_DIR$/src/openpose/exportHumanPoseTxt.cpp" />
         <option value="$PROJECT_DIR$/main.cpp" />
+        <option value="$PROJECT_DIR$/src/panorama.h" />
         <option value="$PROJECT_DIR$/src/panorama.cpp" />
       </list>
     </option>
@@ -243,8 +240,8 @@
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="2018" />
-    <option name="y" value="396" />
+    <option name="x" value="2261" />
+    <option name="y" value="179" />
     <option name="width" value="1855" />
     <option name="height" value="1042" />
   </component>
@@ -290,19 +287,6 @@
               <item name="runnerSteps" type="dad4c3:CidrFilesViewHelper$MyProjectTreeStructure$1" />
               <item name="100mStepDetection" type="462c0819:PsiDirectoryNode" />
               <item name="projects" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="runnerSteps" type="dad4c3:CidrFilesViewHelper$MyProjectTreeStructure$1" />
-              <item name="100mStepDetection" type="462c0819:PsiDirectoryNode" />
-              <item name="projects" type="462c0819:PsiDirectoryNode" />
-              <item name="2009_London" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="runnerSteps" type="dad4c3:CidrFilesViewHelper$MyProjectTreeStructure$1" />
-              <item name="100mStepDetection" type="462c0819:PsiDirectoryNode" />
-              <item name="projects" type="462c0819:PsiDirectoryNode" />
-              <item name="2009_London" type="462c0819:PsiDirectoryNode" />
-              <item name="texts" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="runnerSteps" type="dad4c3:CidrFilesViewHelper$MyProjectTreeStructure$1" />
@@ -402,12 +386,12 @@
       <workItem from="1548820144290" duration="26419000" />
       <workItem from="1549341994741" duration="24232000" />
       <workItem from="1549522485156" duration="7000" />
-      <workItem from="1549522509142" duration="16747000" />
+      <workItem from="1549522509142" duration="35832000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="112802000" />
+    <option name="totallyTimeSpent" value="131887000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1984" y="-4" width="1857" height="1085" extended-state="6" />
@@ -417,13 +401,13 @@
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3274244" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295099" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3211679" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3211679" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22523461" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15168229" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295099" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3806048" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3806048" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -470,56 +454,11 @@
           <option name="timeStamp" value="97" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="99" />
+      <option name="time" value="110" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/projects/2009_London/images/image0040.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2009_London/images/image0041.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2009_London/images/image0042.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2009_London/images/image0045.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2009_London/openpose_image/0002.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2009_London/openpose_image/0014.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2009_London/openpose_image/0017.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2009_London/openpose_image/0019.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projects/2009_London/openpose_image/0021.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/projects/2009_London/openpose_image/0025.jpg">
       <provider selected="true" editor-type-id="images">
         <state />
@@ -699,22 +638,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///usr/include/c++/4.8/bits/stl_vector.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="291">
-          <caret line="247" column="6" lean-forward="false" selection-start-line="247" selection-start-column="6" selection-end-line="247" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/loadOpenPoseData.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="244" column="0" lean-forward="false" selection-start-line="244" selection-start-column="0" selection-end-line="244" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/virtualRace.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="374">
@@ -726,7 +649,7 @@
     <entry file="file://$PROJECT_DIR$/projects/2009_London/texts/homography.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-187">
-          <caret line="10" column="91" lean-forward="true" selection-start-line="10" selection-start-column="91" selection-end-line="10" selection-end-column="91" />
+          <caret line="10" column="91" lean-forward="false" selection-start-line="10" selection-start-column="91" selection-end-line="10" selection-end-column="91" />
           <folding />
         </state>
       </provider>
@@ -747,22 +670,98 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/panorama.cpp">
+    <entry file="file://$PROJECT_DIR$/src/openpose/exportHumanPoseTxt.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="463" column="64" lean-forward="true" selection-start-line="463" selection-start-column="64" selection-end-line="463" selection-end-column="64" />
-          <folding>
-            <element signature="e#0#21#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="501">
+          <caret line="115" column="25" lean-forward="false" selection-start-line="115" selection-start-column="25" selection-end-line="115" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2016_Rio/openpose_image/0002.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2016_Rio/openpose_image/0001.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2016_Rio/openpose_image/0000.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projects/2017_London/openpose_image/0001.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/loadOpenPoseData.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="344">
+          <caret line="221" column="0" lean-forward="true" selection-start-line="221" selection-start-column="0" selection-end-line="221" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/include/opencv2/core/types.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="189">
+          <caret line="1176" column="0" lean-forward="false" selection-start-line="1176" selection-start-column="0" selection-end-line="1176" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/panorama.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="265">
+          <caret line="200" column="31" lean-forward="false" selection-start-line="200" selection-start-column="31" selection-end-line="200" selection-end-column="31" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="68" column="28" lean-forward="true" selection-start-line="68" selection-start-column="28" selection-end-line="68" selection-end-column="28" />
+        <state relative-caret-position="337">
+          <caret line="70" column="20" lean-forward="true" selection-start-line="70" selection-start-column="20" selection-end-line="70" selection-end-column="20" />
           <folding>
             <element signature="e#102#131#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/4.8/bits/stl_vector.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="189">
+          <caret line="311" column="0" lean-forward="false" selection-start-line="311" selection-start-column="0" selection-end-line="311" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/4.8/bits/alloc_traits.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="189">
+          <caret line="253" column="0" lean-forward="false" selection-start-line="253" selection-start-column="0" selection-end-line="253" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/4.8/ext/new_allocator.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="189">
+          <caret line="119" column="0" lean-forward="false" selection-start-line="119" selection-start-column="0" selection-end-line="119" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/panorama.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="171" column="74" lean-forward="true" selection-start-line="171" selection-start-column="74" selection-end-line="171" selection-end-column="74" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
           </folding>
         </state>
       </provider>

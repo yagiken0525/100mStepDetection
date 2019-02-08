@@ -70,13 +70,113 @@ void Panorama::trackDetection() {
     getOpenPoseMask();
 }
 
+class Tracker{
+public:
+    Tracker(cv::Point2f headPt, float dist, int runnerID){
+        _headPt = headPt; _dist = dist; _runnerID = runnerID;
+    }
+    cv::Point2f _headPt;
+    float _dist;
+    int _runnerID;
+};
+
 void Panorama::trackingRunner() {
-//    selectRunnerCandidates();
-//    trackingUsingHead();
-    vector<cv::Point2f> trackInitPts;
-    clickPoints(imList[0].image, trackInitPts);
-    for(cv::Point2f pt: trackInitPts){
-        cout << pt << endl;
+
+    vector<cv::Point2f> trackPtList;
+    vector<Tracker> trackerList;
+    string file_name = _txt_folder + "/trackingInitPoints.txt";
+    if(!checkFileExistence(file_name)) {
+        ofstream ofs(file_name);
+        clickPoints(imList[0].image, trackPtList);
+        for(cv::Point2f pt: trackPtList) {
+            ofs << pt.x << " " << pt.y << endl;
+        }
+        ofs.close();
+    }else{
+        std::ifstream ifs(file_name);
+        std::string str;
+        while (getline(ifs, str)) {
+            vector<string> words = split(str, ' ');
+            cv::Point2f pt(stof(words[0]), stof(words[1]));
+            trackPtList.push_back(pt);
+        }
+        ifs.close();
+    }
+
+    for(cv::Point2f pt: trackPtList){
+        Tracker tracker(pt, 0.0, 100);
+        trackerList.push_back(tracker);
+    }
+
+    vector<OpenPoseBody> *laneTrackingList;
+    laneTrackingList = new vector<OpenPoseBody> [trackPtList.size()];
+    OpenPoseBody lostOP;
+
+    for(int imID = 0; imID < imList.size(); imID++){
+        ImageInfo im = imList[imID];
+        int minOPid = 0;
+        for(int opID = 0; opID < im.Runners.size(); opID++){
+            OpenPoseBody op = im.Runners[opID];
+            cv::Point2f headPt = op._body_parts_coord[0];
+
+            float minDist = TRACKING_MIN_DIST;
+            int ptID = 0;
+            bool found = false;
+            for (cv::Point2f pt : trackPtList) {
+                float dist = calc2PointDistance(pt, headPt);
+                if (dist < minDist) {
+                    minDist = dist;
+                    Tracker tracker(headPt, dist, opID);
+                    trackerList[ptID] = tracker;
+                    found = true;
+                }
+                imList[imID].Runners[minOPid].humanID = ptID;
+                ptID++;
+//                if(!found)
+//                    trackerList[ptID]._runnerID = 100;
+            }
+        }
+
+        for(int i = 0; i < trackerList.size(); i++){
+            cv::Point2f srcPt = trackerList[i]._headPt;
+            float srcDist = trackerList[i]._dist;
+            for(int j = 0; j < trackerList.size(); j++){
+                if(i != j){
+                    cv::Point2f tarPt = trackerList[j]._headPt;
+                    float tarDist = trackerList[j]._dist;
+                    if(srcPt == tarPt){
+                        if(srcDist < tarDist){
+                            trackerList[j]._headPt = trackPtList[j];
+                            trackerList[j]._runnerID = 0;
+                        }else{
+                            trackerList[i]._headPt = trackPtList[i];
+                            trackerList[i]._runnerID = 0;
+                        }
+                    }
+                }
+            }
+        }
+
+        for(int ptID = 0; ptID < trackPtList.size(); ptID++) {
+            trackPtList[ptID] = trackerList[ptID]._headPt;
+            if(trackerList[ptID]._runnerID != 100)
+                laneTrackingList[ptID].push_back(im.Runners[trackerList[ptID]._runnerID]);
+            else{
+                laneTrackingList[ptID].push_back(lostOP);
+            }
+            cv::circle(im.image, trackPtList[ptID], 2, cv::Scalar(0,0,255), 2);
+            cv::putText(im.image, to_string(ptID), trackPtList[ptID], 1, 1, cv::Scalar(0,255,0), 1);
+        }
+
+//        if(laneTrackingList[5][imID]._body_parts_coord.size() != 0)
+//            cv::circle(im.image, laneTrackingList[5][imID]._body_parts_coord[0], 2, cv::Scalar(255,0,0), 2);
+
+        cv::imshow("debug tracking", im.image);
+        cv::waitKey();
+    }
+
+    for(int laneID = 0; laneID < trackPtList.size(); laneID++){
+        this->_laneTrackingList.push_back(laneTrackingList[laneID]);
     }
 
 

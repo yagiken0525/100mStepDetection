@@ -94,15 +94,16 @@ void yagi::outputTextFromVideo(const std::string video_path, const std::string i
 
     //エッジ強調
     const float k = -1.0;
-    Mat sharpningKernel4 = Mat::zeros(3,3,CV_32F);(Mat_<float>(3, 3) << 0.0, k, 0.0, k, 5.0, k, 0.0, k, 0.0);
+    Mat sharpningKernel4 = Mat::zeros(3,3,CV_32F);
     sharpningKernel4.at<float>(0,1) = k;
     sharpningKernel4.at<float>(1,0) = k;
-    sharpningKernel4.at<float>(1,1) = 5.0;
+    sharpningKernel4.at<float>(1,1) = 6.0;
     sharpningKernel4.at<float>(1,2) = k;
     sharpningKernel4.at<float>(2,1) = k;
 
 //    Mat sharpningKernel8 = (Mat_<float>(3, 3) << k, k, k, k, 9.0, k, k, k, k);
 
+    cv::Rect rect(200, 200, 600, 400);
 
     // Process and display image
     bool personFound = false;
@@ -111,9 +112,10 @@ void yagi::outputTextFromVideo(const std::string video_path, const std::string i
         cap>>img ; //1フレーム分取り出してimgに保持させる
         if(img.cols == 0)
             break;
-
+            //cv::Mat crop(img, rect);
+            //img = crop;
              // 先鋭化フィルタを適用する
-//            cv::filter2D(img, img, img.depth(), sharpningKernel4);
+           // cv::filter2D(img, img, img.depth(), sharpningKernel4);
             cv::resize(img, img, Size(), 640.0 / img.cols, 320.0 / img.rows);
             //cv::Mat dummy = cv::Mat::zeros(img.cols, img.rows * (img.), CV_32FC3);
 

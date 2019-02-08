@@ -215,6 +215,8 @@ namespace yagi {
             float outLineDist;
         };
 
+        std::vector<std::vector<OpenPoseBody>> _laneTrackingList;
+
         //Step
         class Step{
         public:
@@ -345,6 +347,8 @@ namespace yagi {
         std::vector<ImageInfo> imList;
 
         int TARGET_RUNNER_ID;
+        int TRACKING_MIN_DIST;
+
 
         void showOnlinePoints(ImageInfo &im);
 

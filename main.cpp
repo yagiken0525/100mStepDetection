@@ -23,7 +23,7 @@ using namespace cv;
 
 int main() {
 //    string folder_path = "/home/yagi/sfmDR/inputVideos/" + video_name + "/";
-    Panorama Panorama("2009_London");
+    Panorama Panorama("2016_Rio");
     Panorama.INIT_PROCESSING = false;
     Panorama.videoType = ".mp4";
 //    Panorama.USE_LASTMASK = false;
@@ -32,6 +32,7 @@ int main() {
     Panorama.SELECT_TARGET_RANE = false;
     Panorama.MAX_TRANSLATION = 3;
     Panorama.TARGET_RUNNER_ID = 6;
+    Panorama.TRACKING_MIN_DIST = 40;
     Panorama.MASK_MARGIN = 50;
     Panorama.OP_MASK_RADIUS = 15;
     Panorama.FIRST_IM_ID = 10;
