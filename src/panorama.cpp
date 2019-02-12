@@ -72,12 +72,13 @@ void Panorama::trackDetection() {
 
 class Tracker{
 public:
-    Tracker(cv::Point2f headPt, float dist, int runnerID){
-        _headPt = headPt; _dist = dist; _runnerID = runnerID;
+    Tracker(cv::Point2f headPt, float dist, int runnerID, bool renewed = false){
+        _headPt = headPt; _dist = dist; _opIdx = runnerID; _renewed = renewed;
     }
     cv::Point2f _headPt;
     float _dist;
-    int _runnerID;
+    int _opIdx;
+    bool _renewed;
 };
 
 void Panorama::trackingRunner() {
@@ -104,7 +105,7 @@ void Panorama::trackingRunner() {
     }
 
     for(cv::Point2f pt: trackPtList){
-        Tracker tracker(pt, 0.0, 100);
+        Tracker tracker(pt, 0.0, -1);
         trackerList.push_back(tracker);
     }
 
@@ -115,26 +116,29 @@ void Panorama::trackingRunner() {
     for(int imID = 0; imID < imList.size(); imID++){
         ImageInfo im = imList[imID];
         int minOPid = 0;
+        for(int trackerID = 0; trackerID < trackerList.size(); trackerID++){
+            trackerList[trackerID]._renewed = false;
+        }
         for(int opID = 0; opID < im.Runners.size(); opID++){
             OpenPoseBody op = im.Runners[opID];
             cv::Point2f headPt = op._body_parts_coord[0];
 
             float minDist = TRACKING_MIN_DIST;
             int ptID = 0;
-            bool found = false;
             for (cv::Point2f pt : trackPtList) {
                 float dist = calc2PointDistance(pt, headPt);
                 if (dist < minDist) {
                     minDist = dist;
-                    Tracker tracker(headPt, dist, opID);
+                    Tracker tracker(headPt, dist, opID, true);
                     trackerList[ptID] = tracker;
-                    found = true;
                 }
                 imList[imID].Runners[minOPid].humanID = ptID;
                 ptID++;
-//                if(!found)
-//                    trackerList[ptID]._runnerID = 100;
             }
+        }
+        for(int trackerID = 0; trackerID < trackerList.size(); trackerID++){
+            if (!trackerList[trackerID]._renewed)
+                trackerList[trackerID]._opIdx = -1;
         }
 
         for(int i = 0; i < trackerList.size(); i++){
@@ -147,10 +151,10 @@ void Panorama::trackingRunner() {
                     if(srcPt == tarPt){
                         if(srcDist < tarDist){
                             trackerList[j]._headPt = trackPtList[j];
-                            trackerList[j]._runnerID = 0;
+                            trackerList[j]._opIdx = -1;
                         }else{
                             trackerList[i]._headPt = trackPtList[i];
-                            trackerList[i]._runnerID = 0;
+                            trackerList[i]._opIdx = -1;
                         }
                     }
                 }
@@ -159,8 +163,8 @@ void Panorama::trackingRunner() {
 
         for(int ptID = 0; ptID < trackPtList.size(); ptID++) {
             trackPtList[ptID] = trackerList[ptID]._headPt;
-            if(trackerList[ptID]._runnerID != 100)
-                laneTrackingList[ptID].push_back(im.Runners[trackerList[ptID]._runnerID]);
+            if(trackerList[ptID]._opIdx > 0)
+                laneTrackingList[ptID].push_back(im.Runners[trackerList[ptID]._opIdx]);
             else{
                 laneTrackingList[ptID].push_back(lostOP);
             }
@@ -168,8 +172,8 @@ void Panorama::trackingRunner() {
             cv::putText(im.image, to_string(ptID), trackPtList[ptID], 1, 1, cv::Scalar(0,255,0), 1);
         }
 
-//        if(laneTrackingList[5][imID]._body_parts_coord.size() != 0)
-//            cv::circle(im.image, laneTrackingList[5][imID]._body_parts_coord[0], 2, cv::Scalar(255,0,0), 2);
+        if(laneTrackingList[5][imID]._body_parts_coord.size() != 0)
+            cv::circle(im.image, laneTrackingList[5][imID]._body_parts_coord[0], 2, cv::Scalar(255,0,0), 2);
 
         cv::imshow("debug tracking", im.image);
         cv::waitKey();
