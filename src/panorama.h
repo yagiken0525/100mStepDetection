@@ -11,7 +11,6 @@
 #include "videoToImage/trimVideo.h"
 
 
-
 namespace yagi {
 
     class Panorama {
@@ -28,7 +27,9 @@ namespace yagi {
 
 
         int MASK_MARGIN;
+        bool SHOW_TRACKING_RUNNER;
         int MAX_TRANSLATION;
+        int FPS;
         bool SHOW_TRANSLATION;
         bool SHOW_HOMOGRAPHY;
         bool SHOW_TRACKLINES;
@@ -57,6 +58,7 @@ namespace yagi {
         void setVariables(std::string video_name);
 
 
+        void correctSteps();
         void trackMask(cv::Mat& im);
         void videotoImage();
         cv::Point2f templateMatching(cv::Mat& im1, cv::Mat& im2, cv::Rect tempRect, cv::Mat& maskImage, cv::Point2f preTranslation,  const int frameID);
@@ -67,10 +69,12 @@ namespace yagi {
         void featurePointFindHomography();
         void maskingRunners();
         void trackingUsingHead();
-
+        bool checkMin(int imID, int laneID);
+        bool checkInLaneLines(int imID, int laneID);
         void loadingData();
         void loadImage();
         void masking();
+        void calcMeanStep();
 
 
         cv::Mat  calcOpenPoseMask(std::vector<cv::Point2f>& pts, cv::Size imSize);
@@ -109,7 +113,7 @@ namespace yagi {
         void getOverviewHomography();
 
 
-        void projectOverview();
+        void measuringStepPositions();
 
 
         void projectTrackLine();
@@ -188,6 +192,7 @@ namespace yagi {
         std::string videoType;
         //
         std::vector<std::string> img_names;
+        cv::Mat resizeH;
 
         //OpenPoseBody
         class OpenPoseBody {
@@ -203,7 +208,7 @@ namespace yagi {
             //Variables
             cv::Rect mask_rect;
             int humanID = 100;
-            std::vector<cv::Point2f> _body_parts_coord;
+            std::vector<cv::Point2f> bodyPts;
             std::vector<float> _confidenceMap;
             cv::Mat openPoseMask;
             cv::Mat opMaskedImage;
@@ -213,20 +218,24 @@ namespace yagi {
             cv::Point2f lFoot;
             cv::Mat rectMaskedIm;
             float outLineDist;
+            cv::Point2f footInOV;
+            cv::Point2f footInIm;
+            bool ifSteps;
         };
-
-        std::vector<std::vector<OpenPoseBody>> _laneTrackingList;
 
         //Step
         class Step{
         public:
-            std::string leg;
-            cv::Point2f rightPt;
-            cv::Point2f leftPt;
-            float frame;
-            float pitch;
-            float stride;
+            cv::Point2f _foot;
+            float _frame;
+            float _pitch;
+            float _stride;
         };
+        std::vector<Step> meanStepList;
+        std::vector<std::vector<OpenPoseBody>> _laneTrackingList;
+        std::vector<std::vector<Step>> _laneStepList;
+
+
 
         std::vector<Step> steps;
 
@@ -239,7 +248,7 @@ namespace yagi {
 
 
         //Panorama
-        cv::Mat OverView = cv::Mat::zeros(540, 2000, CV_8UC3);
+        cv::Mat OverView = cv::Mat::zeros(200, 1000, CV_8UC3);
         cv::Mat PanoramaImage = cv::Mat::zeros(20000, 40000, CV_8UC3);
         cv::Mat smallPanoramaImage;
         cv::Mat OriginalPanorama;
@@ -348,6 +357,7 @@ namespace yagi {
 
         int TARGET_RUNNER_ID;
         int TRACKING_MIN_DIST;
+        int STEP_JUDGE_RANGE;
 
 
         void showOnlinePoints(ImageInfo &im);

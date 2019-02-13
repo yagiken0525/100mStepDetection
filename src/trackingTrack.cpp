@@ -255,7 +255,7 @@ void Panorama::trackTracking() {
 //        // 関節位置を投影
 ////        for (OpenPoseBody hb : im->Runners) {
 ////            int jointID = 0;
-////            for (cv::Point2f pt : hb._body_parts_coord){
+////            for (cv::Point2f pt : hb.bodyPts){
 ////                jointID++;
 ////                cv::circle(dummy, pt, 2, WHITE, 2);
 ////            }

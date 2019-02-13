@@ -4,7 +4,11 @@
 #include "basicFunctions/basicFunction.h"
 #include "virtualRace.h"
 #include "nDegreeApproximation.h"
+#include "gnuplot_i.hpp"
+#include "Eigen/Dense"
+#include "unsupported/Eigen/NonLinearOptimization"
 
+using namespace Eigen;
 
 using namespace std;
 using namespace yagi;
@@ -121,7 +125,7 @@ void Panorama::trackingRunner() {
         }
         for(int opID = 0; opID < im.Runners.size(); opID++){
             OpenPoseBody op = im.Runners[opID];
-            cv::Point2f headPt = op._body_parts_coord[0];
+            cv::Point2f headPt = op.bodyPts[0];
 
             float minDist = TRACKING_MIN_DIST;
             int ptID = 0;
@@ -161,6 +165,8 @@ void Panorama::trackingRunner() {
             }
         }
 
+        cv::Mat dummy = im.image.clone();
+
         for(int ptID = 0; ptID < trackPtList.size(); ptID++) {
             trackPtList[ptID] = trackerList[ptID]._headPt;
             if(trackerList[ptID]._opIdx > 0)
@@ -168,159 +174,160 @@ void Panorama::trackingRunner() {
             else{
                 laneTrackingList[ptID].push_back(lostOP);
             }
-            cv::circle(im.image, trackPtList[ptID], 2, cv::Scalar(0,0,255), 2);
-            cv::putText(im.image, to_string(ptID), trackPtList[ptID], 1, 1, cv::Scalar(0,255,0), 1);
+            cv::circle(dummy, trackPtList[ptID], 2, cv::Scalar(0,0,255), 2);
+            cv::putText(dummy, to_string(ptID), trackPtList[ptID], 1, 1, cv::Scalar(0,255,0), 1);
         }
 
-        if(laneTrackingList[5][imID]._body_parts_coord.size() != 0)
-            cv::circle(im.image, laneTrackingList[5][imID]._body_parts_coord[0], 2, cv::Scalar(255,0,0), 2);
+        if(SHOW_TRACKING_RUNNER) {
+            if (laneTrackingList[5][imID].bodyPts.size() != 0)
+                cv::circle(dummy, laneTrackingList[5][imID].bodyPts[0], 2, cv::Scalar(255, 0, 0), 2);
 
-        cv::imshow("debug tracking", im.image);
-        cv::waitKey();
+            cv::imshow("debug tracking", dummy);
+            cv::waitKey();
+        }
     }
 
     for(int laneID = 0; laneID < trackPtList.size(); laneID++){
         this->_laneTrackingList.push_back(laneTrackingList[laneID]);
     }
 
-
-    //最も近い直線を算出
-    for (int i = 0; i < imList.size(); i++) {
-        ImageInfo &im = imList[i];
-        int humanID = 0;
-        for(int k = 0; k < im.Runners.size(); k++) {
-            float minDist = 1000000;
-            int minLineID = 0;
-            float distR = distPoint2Line(im.Runners[k].rFoot, im.grads[0], im.segments[0]);
-            float distL = distPoint2Line(im.Runners[k].lFoot, im.grads[0], im.segments[0]);
-            cv::Point2f foot = (distR > distL ? im.Runners[k].rFoot : im.Runners[k].lFoot);
-            cv::Point2f other_foot = (distR > distL ? im.Runners[k].lFoot : im.Runners[k].rFoot);
-            im.Runners[k].outLineDist = (distR > distL ? distR : distL);
-            foot.y += 0;
-            for(int lineID = 0; lineID < im.grads.size(); lineID++){
-                float dist = distPoint2Line(foot, im.grads[lineID], im.segments[lineID]);
-                if(dist < minDist){
-                    minDist = dist;
-                    minLineID = lineID;
-                }
-            }
-            im.Runners[k].humanID = minLineID;
-            if(minLineID == 8) {
-                cv::circle(im.image, foot, 2, cv::Scalar(255, 0, 0), 2);
-                cv::circle(im.image, other_foot, 2, cv::Scalar(0, 0, 255), 2);
-            }
-//            cv::putText(im.image, to_string(int(im.Runners[k].outLineDist)), foot,
-//                        cv::FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(0, 0, 200), 2, CV_AA);
-        }
-//        cv::imshow("a", im.image);
-//        cv::waitKey();
-
-    }
-
-
-    ImageInfo preIm;
-    for (int i = 0; i < imList.size(); i++) {
-        ImageInfo im = imList[i];
-        int humanID = 0;
-        for(int k = 0; k < im.Runners.size(); k++) {
-            OpenPoseBody hb = im.Runners[k];
-            if(i == 0){
-//                imList[i].Runners[k].humanID = humanID;
-            }else {
-                float maxHist = 0;
-                int validJointsNum = 0;
-                float minDist = 10000000000;
-                vector<cv::Point2f> joints = hb.getBodyCoord();
-                for (OpenPoseBody pre_hb: preIm.Runners) {
-                    //ヒストグラム
-                    float sumHist = 0;
-                    sumHist+=cv::compareHist(hb.histChannel[0], pre_hb.histChannel[0], 0);
-                    sumHist+=cv::compareHist(hb.histChannel[1], pre_hb.histChannel[1], 0);
-                    sumHist+=cv::compareHist(hb.histChannel[2], pre_hb.histChannel[2], 0);
-
-//                    cv::imshow("hb_G", hb.histGraph[1]);
-//                    cv::imshow("prehb_G", pre_hb.histGraph[1]);
-//                    cv::imshow("hb_B", hb.histGraph[2]);
-//                    cv::imshow("prehb_B", pre_hb.histGraph[2]);
-                    cout << pre_hb.humanID << " " << sumHist << endl;
-//                    if(maxHist < sumHist){
-//                        maxHist = sumHist;
-//                        imList[i].Runners[k].humanID = pre_hb.humanID;
-//                        cv::imshow("hb_R", hb.rectMaskedIm);
-//                        cv::imshow("prehb_R", pre_hb.rectMaskedIm);
-//                    }
-                    cout << maxHist << " " << imList[i].Runners[k].humanID << endl << endl;
-
-                    //関節距離
-//                    float sumDist = 0;
-//                    vector<cv::Point2f> prejoints = pre_hb.getBodyCoord();
-//                    for(int l=0; l < joints.size(); l++){
-//                        if ((l == 0) || ( l== 1) || (l == 2) || (l == 5) || (l == 8)) {
-//                            if ((joints[l] == cv::Point2f(0, 0)) || (prejoints[l] == cv::Point2f(0, 0)))
-//                                continue;
-//                            sumDist += calc2PointDistance(joints[l], prejoints[l]);
-//                            validJointsNum++;
-//                        }
-//                    }
-//                    sumDist/=validJointsNum;
-//                    sumDist - pow(sumHist, 5);
-//                    cout << " sumDist " << sumDist << endl;
-//                    cout << " sumHist " << sumHist << endl;
-//
-//                    if(minDist > sumDist){
-//                        minDist = sumDist;
-//                        imList[i].Runners[k].humanID = pre_hb.humanID;
-//                    }
-                }
-//                cv::waitKey();
-
-//                cout << minDist << endl;
-            }
-            humanID++;
-//            vector<bool> validIDlist(100, false);
-//            for(int k = 0; k < im.Runners.size(); k++){
-//                if(validIDlist[imList[i].Runners[k].humanID] == false){
-//                    validIDlist[imList[i].Runners[k].humanID] = true;
-//                }else{
-//                    for(int l = 0; l < validIDlist.size(); l++){
-//                        if(validIDlist[l] == false){
-//                            validIDlist[l] = true;
-//                            imList[i].Runners[k].humanID = l;
-//                            break;
-//                        }
-//                    }
+//    //最も近い直線を算出
+//    for (int i = 0; i < imList.size(); i++) {
+//        ImageInfo &im = imList[i];
+//        int humanID = 0;
+//        for(int k = 0; k < im.Runners.size(); k++) {
+//            float minDist = 1000000;
+//            int minLineID = 0;
+//            float distR = distPoint2Line(im.Runners[k].rFoot, im.grads[0], im.segments[0]);
+//            float distL = distPoint2Line(im.Runners[k].lFoot, im.grads[0], im.segments[0]);
+//            cv::Point2f foot = (distR > distL ? im.Runners[k].rFoot : im.Runners[k].lFoot);
+//            cv::Point2f other_foot = (distR > distL ? im.Runners[k].lFoot : im.Runners[k].rFoot);
+//            im.Runners[k].outLineDist = (distR > distL ? distR : distL);
+//            foot.y += 0;
+//            for(int lineID = 0; lineID < im.grads.size(); lineID++){
+//                float dist = distPoint2Line(foot, im.grads[lineID], im.segments[lineID]);
+//                if(dist < minDist){
+//                    minDist = dist;
+//                    minLineID = lineID;
 //                }
 //            }
-//            cv::putText(im.image, to_string(imList[i].Runners[k].humanID), im.Runners[k]._body_parts_coord[0],
-//                        cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 255), 1, CV_AA);
-        }
-//        cv::imshow("humanID", im.image);
-//        cv::waitKey();
-        preIm = imList[i];
-    }
-
-
-
-//    ofstream opCsvData(_txt_folder + "opData.csv");
+//            im.Runners[k].humanID = minLineID;
+//            if(minLineID == 8) {
+//                cv::circle(im.image, foot, 2, cv::Scalar(255, 0, 0), 2);
+//                cv::circle(im.image, other_foot, 2, cv::Scalar(0, 0, 255), 2);
+//            }
+////            cv::putText(im.image, to_string(int(im.Runners[k].outLineDist)), foot,
+////                        cv::FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(0, 0, 200), 2, CV_AA);
+//        }
+////        cv::imshow("a", im.image);
+////        cv::waitKey();
+//
+//    }
+//
+//
+//    ImageInfo preIm;
 //    for (int i = 0; i < imList.size(); i++) {
 //        ImageInfo im = imList[i];
-//        cv::Mat dummy = im.image;
-//        for (OpenPoseBody hb: im.Runners) {
-//            cv::circle(dummy, hb._body_parts_coord[0], 3, cv::Scalar(0,0,255), 3);
-//            cv::circle(dummy, hb._body_parts_coord[8], 3, cv::Scalar(0,0,255), 3);
-//            cv::circle(dummy, hb._body_parts_coord[14], 3, cv::Scalar(0,0,255), 3);
-//            for(cv::Point2f pt : hb._body_parts_coord){
-//                float x = pt.x - hb._body_parts_coord[0].x;
-//                float y = pt.y - hb._body_parts_coord[0].y;
-//                opCsvData << x << " " << y << " ";
+//        int humanID = 0;
+//        for(int k = 0; k < im.Runners.size(); k++) {
+//            OpenPoseBody hb = im.Runners[k];
+//            if(i == 0){
+////                imList[i].Runners[k].humanID = humanID;
+//            }else {
+//                float maxHist = 0;
+//                int validJointsNum = 0;
+//                float minDist = 10000000000;
+//                vector<cv::Point2f> joints = hb.getBodyCoord();
+//                for (OpenPoseBody pre_hb: preIm.Runners) {
+//                    //ヒストグラム
+//                    float sumHist = 0;
+//                    sumHist+=cv::compareHist(hb.histChannel[0], pre_hb.histChannel[0], 0);
+//                    sumHist+=cv::compareHist(hb.histChannel[1], pre_hb.histChannel[1], 0);
+//                    sumHist+=cv::compareHist(hb.histChannel[2], pre_hb.histChannel[2], 0);
+//
+////                    cv::imshow("hb_G", hb.histGraph[1]);
+////                    cv::imshow("prehb_G", pre_hb.histGraph[1]);
+////                    cv::imshow("hb_B", hb.histGraph[2]);
+////                    cv::imshow("prehb_B", pre_hb.histGraph[2]);
+//                    cout << pre_hb.humanID << " " << sumHist << endl;
+////                    if(maxHist < sumHist){
+////                        maxHist = sumHist;
+////                        imList[i].Runners[k].humanID = pre_hb.humanID;
+////                        cv::imshow("hb_R", hb.rectMaskedIm);
+////                        cv::imshow("prehb_R", pre_hb.rectMaskedIm);
+////                    }
+//                    cout << maxHist << " " << imList[i].Runners[k].humanID << endl << endl;
+//
+//                    //関節距離
+////                    float sumDist = 0;
+////                    vector<cv::Point2f> prejoints = pre_hb.getBodyCoord();
+////                    for(int l=0; l < joints.size(); l++){
+////                        if ((l == 0) || ( l== 1) || (l == 2) || (l == 5) || (l == 8)) {
+////                            if ((joints[l] == cv::Point2f(0, 0)) || (prejoints[l] == cv::Point2f(0, 0)))
+////                                continue;
+////                            sumDist += calc2PointDistance(joints[l], prejoints[l]);
+////                            validJointsNum++;
+////                        }
+////                    }
+////                    sumDist/=validJointsNum;
+////                    sumDist - pow(sumHist, 5);
+////                    cout << " sumDist " << sumDist << endl;
+////                    cout << " sumHist " << sumHist << endl;
+////
+////                    if(minDist > sumDist){
+////                        minDist = sumDist;
+////                        imList[i].Runners[k].humanID = pre_hb.humanID;
+////                    }
+//                }
+////                cv::waitKey();
+//
+////                cout << minDist << endl;
 //            }
-//            cv::imshow("op for keras", dummy);
-//            int key = cv::waitKey();
-//            opCsvData << key - 177 << endl;
+//            humanID++;
+////            vector<bool> validIDlist(100, false);
+////            for(int k = 0; k < im.Runners.size(); k++){
+////                if(validIDlist[imList[i].Runners[k].humanID] == false){
+////                    validIDlist[imList[i].Runners[k].humanID] = true;
+////                }else{
+////                    for(int l = 0; l < validIDlist.size(); l++){
+////                        if(validIDlist[l] == false){
+////                            validIDlist[l] = true;
+////                            imList[i].Runners[k].humanID = l;
+////                            break;
+////                        }
+////                    }
+////                }
+////            }
+////            cv::putText(im.image, to_string(imList[i].Runners[k].humanID), im.Runners[k].bodyPts[0],
+////                        cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 255), 1, CV_AA);
 //        }
+////        cv::imshow("humanID", im.image);
+////        cv::waitKey();
+//        preIm = imList[i];
 //    }
-
-    trackTargetRunner();
+//
+//
+//
+////    ofstream opCsvData(_txt_folder + "opData.csv");
+////    for (int i = 0; i < imList.size(); i++) {
+////        ImageInfo im = imList[i];
+////        cv::Mat dummy = im.image;
+////        for (OpenPoseBody hb: im.Runners) {
+////            cv::circle(dummy, hb.bodyPts[0], 3, cv::Scalar(0,0,255), 3);
+////            cv::circle(dummy, hb.bodyPts[8], 3, cv::Scalar(0,0,255), 3);
+////            cv::circle(dummy, hb.bodyPts[14], 3, cv::Scalar(0,0,255), 3);
+////            for(cv::Point2f pt : hb.bodyPts){
+////                float x = pt.x - hb.bodyPts[0].x;
+////                float y = pt.y - hb.bodyPts[0].y;
+////                opCsvData << x << " " << y << " ";
+////            }
+////            cv::imshow("op for keras", dummy);
+////            int key = cv::waitKey();
+////            opCsvData << key - 177 << endl;
+////        }
+////    }
+//
+//    trackTargetRunner();
 }
 
 void Panorama::makePanorama(){
@@ -342,8 +349,8 @@ void Panorama::makePanorama(){
 
 void Panorama::estimateStepPoints(){
     getOverviewHomography();
-    projectTrackLine();
-    projectOverview();
+//    projectTrackLine();
+    measuringStepPositions();
 }
 
 
@@ -368,7 +375,7 @@ void Panorama::selectRunnerCandidates() {
 //        //このフレームに映る人物の中から選手候補となる人物を選択
 //        cv::Point2f zero(0,0);
 //        for (OpenPoseBody hb: im.Runners) {
-//            for(cv::Point2f pt : hb._body_parts_coord) {
+//            for(cv::Point2f pt : hb.bodyPts) {
 ////                if () {
 ////                    if (head.y > ((a9 * head.x) + b9)) {
 ////                        continue;
@@ -476,7 +483,7 @@ void Panorama::generatePanorama() {
         }
 
         cv::Vec3b BLACK(0, 0, 0);
-        int frame_counter = 1;
+        int frame_counter = 0;
         int x_min, y_min, x_max, y_max;
         for (frame_counter; frame_counter < imList.size(); frame_counter++) {
 
@@ -551,6 +558,8 @@ void Panorama::generatePanorama() {
         this->Panorama_width = panorama.cols;
         this->Panorama_height = panorama.rows;
 
+        ofs << "PanoramaSize " << panorama.cols << " " << panorama.rows;
+
         cv::Mat smallPanorama;
         cv::resize(panorama, smallPanorama, cv::Size(), smallPanorama_width / Panorama_width,
                    smallPanorama_height / Panorama_height);
@@ -562,20 +571,39 @@ void Panorama::generatePanorama() {
         int frameID = 0;
         while(getline(ifs, str)){
             vector<string> words = split(str, ' ');
-            cv::Mat H = cv::Mat::zeros(3, 3, CV_64F);
-            for(int i = 0; i < 3; i++){
-                for(int j = 0; j < 3; j++){
-                    H.at<double>(i, j) = stod(words[i * 3 + j]);
+            if(words[0] != "PanoramaSize") {
+                cv::Mat H = cv::Mat::zeros(3, 3, CV_64F);
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        H.at<double>(i, j) = stod(words[i * 3 + j]);
+                    }
                 }
+                imList[frameID].mulH = H;
+                frameID++;
+            }else{
+                this->Panorama_width = stof(words[1]);
+                this->Panorama_height = stof(words[2]);
             }
-            imList[frameID].mulH = H;
         }
         this->smallPanoramaImage = cv::imread(_result_folder + "/panorama.jpg");
         ifs.close();
     }
 
+    cv::Mat resizeH;
+    vector<cv::Point2f> panoCornerPts;
+    vector<cv::Point2f> sPanoCornerPts;
+    yagi::push4PointsToVector(panoCornerPts, cv::Point2f(0,0), cv::Point2f(Panorama_width, 0),
+                              cv::Point2f(Panorama_width, Panorama_height), cv::Point2f(0, Panorama_height));
+    yagi::push4PointsToVector(sPanoCornerPts, cv::Point2f(0,0), cv::Point2f(smallPanorama_width, 0),
+                              cv::Point2f(smallPanorama_width, smallPanorama_height), cv::Point2f(0, smallPanorama_height));
+    resizeH = cv::findHomography(panoCornerPts, sPanoCornerPts);
+    this->resizeH = resizeH;
+
+    cv::Mat smallsmall;
+    cv::warpPerspective(this->smallPanoramaImage, smallsmall, resizeH, smallPanoramaImage.size());
 
     cv::imshow("panorama", this->smallPanoramaImage);
+    cv::imshow("smallpanorama", smallsmall);
     cv::waitKey();
     cv::imwrite(_result_folder + "/panorama.jpg", this->smallPanoramaImage);
     cv::destroyAllWindows();
@@ -925,15 +953,15 @@ void Panorama::getOverviewHomography(){
 
     //パノラマ->俯瞰画像へのホモグラフィー
     cv::Mat H = cv::findHomography(cornerPoints, overviewCornerPoints);
-    H.convertTo(H, CV_32F);
+//    H.convertTo(H, CV_32F);
     this->overView_H = H;
     cout << H << endl;
 
     //俯瞰画像を表示
     cv::Mat overviewImage;
-    cv::warpPerspective(this->PanoramaImage, overviewImage, this->overView_H, this->OverView.size());
+    cv::warpPerspective(this->smallPanoramaImage, overviewImage, this->overView_H, this->OverView.size());
 
-    cv::resize(overviewImage, overviewImage, cv::Size(), 0.5, 0.5);
+//    cv::resize(overviewImage, overviewImage, cv::Size(), 0.5, 0.5);
     cv::imshow("overview Image first", overviewImage);
     cv::imwrite("../images/" + this->_video_name + "/OverView.jpg", overviewImage);
     cv::waitKey();
@@ -1023,31 +1051,21 @@ void Panorama::projectTrackLine() {
     //resizeの分投影点の各座標をx倍する
     for (int pt = 0; pt < panoramaInline10mPoints.size(); pt++) {
         cv::circle(this->PanoramaImage, panoramaInline10mPoints[pt], 2, BLUE, 2);
-        panoramaInline10mPoints[pt].x = panoramaInline10mPoints[pt].x * (1 / this->Panorama_width);
-        panoramaInline10mPoints[pt].y = panoramaInline10mPoints[pt].y * (1 / this->Panorama_height);
+        panoramaInline10mPoints[pt].x = panoramaInline10mPoints[pt].x * (this->Panorama_width/smallPanorama_width);
+        panoramaInline10mPoints[pt].y = panoramaInline10mPoints[pt].y * (this->Panorama_height/smallPanorama_height);
         cv::circle(this->PanoramaImage, panoramaInline10mPoints[pt], 3, BLUE, 3);
     }
 
     for (int pt = 0; pt < panoramaOutline10mPoints.size(); pt++) {
         cv::circle(this->PanoramaImage, panoramaOutline10mPoints[pt], 2, BLUE, 2);
-        panoramaOutline10mPoints[pt].x = panoramaOutline10mPoints[pt].x * (1 / this->Panorama_width);
-        panoramaOutline10mPoints[pt].y = panoramaOutline10mPoints[pt].y * (1 / this->Panorama_height);
+        panoramaOutline10mPoints[pt].x = panoramaOutline10mPoints[pt].x * (this->Panorama_width/smallPanorama_width);
+        panoramaOutline10mPoints[pt].y = panoramaOutline10mPoints[pt].y * (this->Panorama_height/smallPanorama_height);
         cv::circle(this->PanoramaImage, panoramaOutline10mPoints[pt], 3, BLUE, 3);
     }
-
-//    //俯瞰画像を表示
-//    cv::Mat overviewImage;
-//    cv::warpPerspective(this->PanoramaImage, overviewImage, this->overView_H, this->OverView.size());
-//    cv::resize(overviewImage, overviewImage, cv::Size(), 0.5, 0.5);
-//    cv::imshow("overview Image", overviewImage);
-//    cv::imwrite("../panoramaImage/OverView_" + this->_video_name + ".jpg", overviewImage);
-//    cv::waitKey();
-//    this->overviewPanorama = overviewImage;
 
     //ImageInfoに格納
     this->panoramaInline10mPoints = panoramaInline10mPoints;
     this->panoramaOutline10mPoints = panoramaOutline10mPoints;
-
 
     //各フレームに投影
     for (int i = 0; i < imList.size() - 1; i++) {
@@ -1072,8 +1090,8 @@ void Panorama::projectTrackLine() {
             std::pair<cv::Point2f, cv::Point2f> line(inPt, outPt);
             imList[i].lines10m.push_back(line);
         }
-//        cv::imshow("10m line", im.image);
-//        cv::waitKey();
+        cv::imshow("10m line", im.image);
+        cv::waitKey();
     }
 }
 
@@ -1309,67 +1327,67 @@ void Panorama::mergeStepID() {
 }
 
 void Panorama::visualizeSteps(){
-    cv::Scalar White(255,255,255);
-    cv::Mat overview_dummy = cv::Mat::zeros(cv::Size(1000, 200), CV_8UC3);
-
-    //10mラインの描写
-    for (int i = 1; i < 10; i++){
-        cv::Point2f ptup(i * 100, 0);
-        cv::Point2f ptdown(i * 100, 200);
-        cv::Scalar color(255,255,255);
-        cv::line(overview_dummy, ptup, ptdown, color, 1);
-    }
-
-    int frame_num = 0;
-    int preStepFrame = 0;
-    int text_position = 20;
-    for(ImageInfo im: imList){
-        if(im.stepPoint){
-            text_position *= -1;
-            if(this->stepPoints.size() > 0){
-                averagePitch += (frame_num - preStepFrame);
-            }
-            preStepFrame = frame_num;
-            cout << "Step Frame: " << frame_num << endl;
-            if(im.Rstep) {
-                cv::Point2f pt = im.overviewRfoot;
-                pt.y = 100;
-                cv::circle(overview_dummy, pt, 2, White, 2);
-
-                pt.y += text_position;
-                cv::putText(overview_dummy, to_string(frame_num), pt,
-                            cv::FONT_HERSHEY_SIMPLEX, 0.3, cv::Scalar(255, 255, 255), 1, CV_AA);
-                this->stepPoints.push_back(im.overviewRfoot);
-            }else{
-                cv::Point2f pt = im.overviewLfoot;
-                pt.y = 100;
-                cv::circle(overview_dummy, pt, 2, White, 2);
-
-                pt.y += text_position;
-                cv::putText(overview_dummy, to_string(frame_num), pt,
-                            cv::FONT_HERSHEY_SIMPLEX, 0.3, cv::Scalar(255, 255, 255), 1, CV_AA);
-                this->stepPoints.push_back(im.overviewLfoot);
-            }
-
-            //接地点情報をベクトルに追加
-            Step newStep;
-            newStep.frame = frame_num;
-            newStep.pitch = frame_num - preStepFrame;
-            if(im.Rstep)
-                newStep.leg = "R";
-            else
-                newStep.leg = "L";
-            newStep.rightPt = im.overviewRfoot;
-            newStep.leftPt = im.overviewLfoot;
-
-            this->steps.push_back(newStep);
-        }
-        frame_num++;
-    }
-    averagePitch /= (this->stepPoints.size() - 1);
-    cout << averagePitch;
-    cv::imshow("over view image", overview_dummy);
-    cv::waitKey();
+//    cv::Scalar White(255,255,255);
+//    cv::Mat overview_dummy = cv::Mat::zeros(cv::Size(1000, 200), CV_8UC3);
+//
+//    //10mラインの描写
+//    for (int i = 1; i < 10; i++){
+//        cv::Point2f ptup(i * 100, 0);
+//        cv::Point2f ptdown(i * 100, 200);
+//        cv::Scalar color(255,255,255);
+//        cv::line(overview_dummy, ptup, ptdown, color, 1);
+//    }
+//
+//    int frame_num = 0;
+//    int preStepFrame = 0;
+//    int text_position = 20;
+//    for(ImageInfo im: imList){
+//        if(im.stepPoint){
+//            text_position *= -1;
+//            if(this->stepPoints.size() > 0){
+//                averagePitch += (frame_num - preStepFrame);
+//            }
+//            preStepFrame = frame_num;
+//            cout << "Step Frame: " << frame_num << endl;
+//            if(im.Rstep) {
+//                cv::Point2f pt = im.overviewRfoot;
+//                pt.y = 100;
+//                cv::circle(overview_dummy, pt, 2, White, 2);
+//
+//                pt.y += text_position;
+//                cv::putText(overview_dummy, to_string(frame_num), pt,
+//                            cv::FONT_HERSHEY_SIMPLEX, 0.3, cv::Scalar(255, 255, 255), 1, CV_AA);
+//                this->stepPoints.push_back(im.overviewRfoot);
+//            }else{
+//                cv::Point2f pt = im.overviewLfoot;
+//                pt.y = 100;
+//                cv::circle(overview_dummy, pt, 2, White, 2);
+//
+//                pt.y += text_position;
+//                cv::putText(overview_dummy, to_string(frame_num), pt,
+//                            cv::FONT_HERSHEY_SIMPLEX, 0.3, cv::Scalar(255, 255, 255), 1, CV_AA);
+//                this->stepPoints.push_back(im.overviewLfoot);
+//            }
+//
+//            //接地点情報をベクトルに追加
+//            Step newStep;
+//            newStep.frame = frame_num;
+//            newStep.pitch = frame_num - preStepFrame;
+//            if(im.Rstep)
+//                newStep.leg = "R";
+//            else
+//                newStep.leg = "L";
+//            newStep.rightPt = im.overviewRfoot;
+//            newStep.leftPt = im.overviewLfoot;
+//
+//            this->steps.push_back(newStep);
+//        }
+//        frame_num++;
+//    }
+//    averagePitch /= (this->stepPoints.size() - 1);
+//    cout << averagePitch;
+//    cv::imshow("over view image", overview_dummy);
+//    cv::waitKey();
 }
 
 void Panorama::getAllScaleFootPosition(){
@@ -1684,54 +1702,374 @@ void Panorama::pitchCompletion(){
 //    }
 }
 
+bool Panorama::checkMin(int imID, int laneID){
+    vector<float> vec;
+    int margin = STEP_JUDGE_RANGE/2;
+    for(int i = imID-margin; i <= (imID+margin); i++ ){
+        vec.push_back(this->_laneTrackingList[laneID][i].footInOV.y);
+    }
+    float max = *std::max_element(vec.begin(), vec.end());
+    return(max == vec[margin]);
+}
 
-void Panorama::projectOverview() {
+bool Panorama::checkInLaneLines(int imID, int personID){
+    int laneID = personID + 1;
+    ImageInfo im = imList[imID];
+    float upperGrad = im.grads[laneID];
+    float lowerGrad = im.grads[laneID + 1];
+    float upperSegment = im.segments[laneID];
+    float lowerSegment = im.segments[laneID + 1];
+    cv::Point2f foot = _laneTrackingList[personID][imID].footInIm;
+    cv::circle(imList[imID].image, cv::Point2f(foot.x, upperGrad * foot.x + upperSegment), 2, cv::Scalar(255,0,0), 2);
+    cv::circle(imList[imID].image, cv::Point2f(foot.x, lowerGrad * foot.x + lowerSegment), 2, cv::Scalar(0,0,255), 2);
 
-    //色ベクトル
-    vector<cv::Scalar> colors;
-    setColor(&colors);
-
-    //トラッキング対象ランナーの
-    //１原画像での足位置,２パノラマスケールでの足位置,３俯瞰画像での足位置を保存
-    getAllScaleFootPosition();
-
-    // 右足左足と直線の距離出力
-    legLaneDist();
-
-    // 直線距離が近傍xフレームで最小になるフレームをチェック
-    candidateStepFrame();
-
-    // 足が対象レーン内に存在するかどうか確認
-    insideLane();
-
-    //設置候補点の左右統合
-    mergeStepID();
-
-    //接地点の可視化
-    visualizeSteps();
-
-    //ピッチを用いた補正
-    pitchCompletion();
-
-    //歩幅を求める
-    calculateStrideLength();
-
-    //歩幅の可視化
-    visualizeStride();
-
-    //平均歩幅を用いた補正
-    //averageCompletion();
-
-
-
-    //多項式近似による補正
-    nDegreeApproximation Aproximate(4, this->stridePoints);
-
-
+    return ((foot.y > (upperGrad * foot.x + upperSegment)) && (foot.y < (lowerGrad * foot.x + lowerSegment)));
 }
 
 
-//void Panorama::projectOverview() {
+cv::Point2f calcFootCoM(cv::Point2f pt1, cv::Point2f pt2, cv::Point2f pt3){
+    cv::Point2f comPt;
+    int ptNum = 0;
+    vector<cv::Point2f> ptList;
+    ptList.push_back(pt1);
+    ptList.push_back(pt2);
+    ptList.push_back(pt3);
+    for(cv::Point2f pt: ptList){
+        if(pt != cv::Point2f(0.0,0.0)) {
+            comPt += pt;
+            ptNum++;
+        }
+    }
+    return (comPt/ptNum);
+}
+
+void Panorama::calcMeanStep(){
+    for(int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
+        vector<Step> *stepList =  &_laneStepList[laneID];
+        vector<float> strideList;
+        for(Step step:*stepList){
+            strideList.push_back(step._stride);
+        }
+        sort(strideList.begin(), strideList.end());
+        float meanStride = strideList[strideList.size()/2];
+
+        vector<float> pitchList;
+        for(Step step:*stepList){
+            pitchList.push_back(step._pitch);
+        }
+        sort(pitchList.begin(), pitchList.end());
+        float meanPitch = pitchList[pitchList.size()/2];
+
+        Step meanStep;
+        meanStep._stride = meanStride;
+        meanStep._pitch = meanPitch;
+        meanStepList.push_back(meanStep);
+    }
+}
+
+void Panorama::measuringStepPositions() {
+
+    //足関節の投影
+    for (int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
+        vector<OpenPoseBody> *laneOpList = &this->_laneTrackingList[laneID];
+        for (int imID = 0; imID < imList.size(); imID++) {
+            OpenPoseBody *op = &laneOpList->at(imID);
+            if (op->bodyPts.size() > 0) {
+                //画像内の足関節重心を求める
+                cv::Point2f rCoM = calcFootCoM(op->bodyPts[19], op->bodyPts[20], op->bodyPts[21]);
+                cv::Point2f lCoM = calcFootCoM(op->bodyPts[22], op->bodyPts[23], op->bodyPts[24]);
+                op->footInIm = ((distPoint2Line(rCoM, imList[imID].grads[0], imList[imID].segments[0]) >
+                                 distPoint2Line(lCoM, imList[imID].grads[0], imList[imID].segments[0]) ? rCoM : lCoM));
+
+                //俯瞰画像内の足関節重心を求める
+                vector<cv::Point2f> footPt(1, op->footInIm);
+                vector<cv::Point2f> ovPoint;
+                mycalcWarpedPoint(footPt, &ovPoint,
+                                  overView_H * resizeH * imList[imID].mulH);
+                op->footInOV = ovPoint[0];
+
+//                cv::circle(imList[imID].image, op->footInIm, 2, cv::Scalar(0,0,255), 2);
+//                cv::imshow("leg in image", imList[imID].image);
+//                cv::circle(overviewPanorama, op->footInOV, 2, colors[2], 2);
+//                cv::imshow("over", overviewPanorama);
+//                cv::waitKey();
+            }
+        }
+    }
+
+    //接地判定
+    vector<cv::Point2f> neighborFramesLegs;
+    for (int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
+        Step preStep;
+        preStep._foot = cv::Point2f(-10, 0);
+        preStep._frame = -1;
+        vector<Step> stepList;
+        for (int imID = 0; imID < imList.size(); imID++) {
+            //nフレームで最小か
+            if (imID > STEP_JUDGE_RANGE / 2) {
+                cout << checkMin(imID, laneID) << " " << checkInLaneLines(imID, laneID) << endl;
+                if (checkMin(imID, laneID) && checkInLaneLines(imID, laneID)) {
+                    if (_laneTrackingList[laneID][imID].footInOV.x > preStep._foot.x) {
+                        _laneTrackingList[laneID][imID].ifSteps = true;
+                        Step newStep;
+                        newStep._foot = _laneTrackingList[laneID][imID].footInOV;
+                        newStep._frame = imID;
+                        if (preStep._frame > 0) {
+                            newStep._pitch = newStep._frame - preStep._frame;
+                            newStep._stride = newStep._foot.x - preStep._foot.x;
+                        }
+                        stepList.push_back(newStep);
+//                        cv::circle(overviewPanorama, _laneTrackingList[laneID][imID].footInOV, 2, cv::Scalar(0,0,255), 2);
+                        preStep = newStep;
+                    }
+                }
+//                cv::imshow("stepPt", overviewPanorama);
+//                cv::imshow("image", imList[imID].image);
+//                cv::waitKey(0);
+            }
+        }
+        _laneStepList.push_back(stepList);
+    }
+//    cv::waitKey(0);
+    calcMeanStep();
+
+    //ピッチを元に誤った点を削除
+//    for(int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
+//        vector<Step> *stepList = &_laneStepList[laneID];
+//        Step meanStep = meanStepList[laneID];
+//        for (int stepID = 0; stepID < stepList->size(); stepID++) {
+//            cout << stepList->size() << endl;
+//            Step step = stepList->at(stepID);
+//            //TODO f_stride() + f_pitch
+//            cv::circle(overviewPanorama, step._foot, 2, cv::Scalar(0, 0, 255), 2);
+//
+//            if (abs(step._pitch - meanStep._pitch) >= 2) {
+//                cv::circle(overviewPanorama, step._foot, 2, cv::Scalar(0, 255, 0), 2);
+//                stepList->erase(stepList->begin() + stepID);
+//                if(stepList->size() != stepID) {
+////                    stepList->at(stepID)._pitch += step._pitch;
+////                    stepList->at(stepID)._stride += step._stride;
+//                    stepID--;
+//                }
+//            }
+//            cv::imshow("stepPt", overviewPanorama);
+//            cv::waitKey(0);
+//        }
+//    }
+
+//    //10m毎の速度
+//    for (int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
+//        vector<Step> stepList = _laneStepList[laneID];
+//        for(int stepID = 1; stepID < stepList.size(); stepID++){
+//            if((stepList[stepID]._foot.x/100.0 - stepList[stepID - 1]._foot.x/100.0) == 1){
+//
+//            }
+//        }
+//    }
+
+    for (int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
+        vector<Step> stepList = _laneStepList[laneID];
+        vector<vector<Step>> speedEvery10m(10);
+        float predist = 0;
+        float pretime = 0;
+        for(Step step:stepList){
+            float time = step._frame * (1.0/FPS);
+            float dist = step._foot.x/10;
+            float speed = (dist - predist)/(time - pretime);
+            cout << dist << " " << time << " " << speed << " " <<  "pitchnoise: " << step._pitch - meanStepList[laneID]._pitch << endl;
+            predist = dist;
+            pretime = time;
+            if(speed>0){
+                if(dist < 100) {
+                    speedEvery10m[int(dist / 10)].push_back(step);
+                }
+            }
+//            cout << "pitchnoise: " << step._pitch - meanStepList[laneID]._pitch << endl;
+        }
+
+//        int speedListID = 0;
+//        for(vector<Step> speedList: speedEvery10m){
+//            float meanSpeed = 0;
+//            float sumOfPitchNoise = 0;
+//            vector<int> noiseValueList(3,0);
+//            for(Step step : speedList){
+//                sumOfPitchNoise+=abs(step._pitch - meanStepList[laneID]._pitch);
+//                noiseValueList[step._pitch - meanStepList[laneID]._pitch]++;
+//            }
+//            for(Step step : speedList){
+//                meanSpeed+=(step._stride/(step._pitch*(1.0/FPS)))*(step._stride/sumOfPitchNoise);
+//            }
+//        }
+    }
+
+
+
+//    for(int stepID = 0; stepID < stepList->size(); stepID++){
+//        Step step = stepList->at(stepID);
+//        cv::circle(overviewPanorama, step._foot, 2, cv::Scalar(255, 255, 0), 2);
+//        cv::imshow("stepPt", overviewPanorama);
+//        cv::waitKey(0);
+//        cout << step._pitch - meanStep._pitch << endl;
+//        if(step._pitch - meanStep._pitch >= 2){
+//            if(stepID > 0) {
+//                Step newStep;
+//                newStep._foot = cv::Point2f((stepList->at(stepID - 1)._foot + stepList->at(stepID)._foot) / 2);
+//                newStep._stride = newStep._foot.x - stepList->at(stepID - 1)._foot.x;
+//                newStep._frame = (stepList->at(stepID - 1)._frame + stepList->at(stepID)._frame) / 2;
+//                newStep._pitch = newStep._frame - stepList->at(stepID - 1)._frame;
+//                stepList->at(stepID)._stride = step._foot.x - newStep._foot.x;
+//                stepList->at(stepID)._pitch = step._frame - newStep._frame;
+//                cv::circle(overviewPanorama, newStep._foot, 2, cv::Scalar(255, 0, 0), 2);
+//                stepList->insert(stepList->begin() + stepID, newStep);
+//            }
+//            cv::imshow("stepPt", overviewPanorama);
+//            cv::waitKey(0);
+//        }
+//    }
+
+    //接地補正
+    correctSteps();
+}
+
+struct misra1a_functor
+{
+    misra1a_functor(int inputs, int values, double *x, double *y)
+            : inputs_(inputs), values_(values), x(x), y(y) {}
+
+    double *x;
+    double *y;
+
+    // 目的関数
+    int operator()(const Eigen::VectorXd& b, Eigen::VectorXd& fvec) const
+    {
+        for (int i = 0; i < values_; ++i) {
+//            fvec[i] = b[0]*(1.0 - exp(-b[1]*x[i])) - y[i] ;
+            fvec[i] = pow((((b[0] + b[1])*x[i]) - ((b[0]/b[2])*(1.0-exp(-b[2]*x[i]))) + ((b[1]/b[3])*(1.0-exp(b[3]*x[i]))) - y[i]),1);
+        }
+        return 0;
+    }
+    // 微分,ヤコビアン
+    int df(const Eigen::VectorXd& b, Eigen::MatrixXd& fjac)
+    {
+        for (int i = 0; i < values_; ++i) {
+//            fjac(i, 0) = (1.0 - exp(-b[1]*x[i]));
+//            fjac(i, 1) = (b[0]*x[i] * exp(-b[1]*x[i]));
+            fjac(i, 0) = exp(-b[2]*x[i]) * ((b[2]*x[i] - 1.0)*exp(b[2]*x[i]) + 1.0) / b[2];
+            fjac(i, 1) = -(exp(b[3]*x[i]) - b[3]*x[i] - 1.0)/b[3];
+            fjac(i, 2) = exp(-b[2]*x[i])*(b[0]*exp(b[2]*x[i]) - b[0]*b[2]*x[i] - b[0])/(b[2]*b[2]);
+            fjac(i, 3) = -(((b[1]*b[3]*x[i] - b[1])*exp(b[3]*x[i])) + b[1])/(b[3]*b[3]);
+        }
+        return 0;
+    }
+
+    const int inputs_;
+    const int values_;
+    int inputs() const { return inputs_; }
+    int values() const { return values_; }
+};
+
+
+void Panorama::correctSteps() {
+
+    const int n = 4; // 未知数の数
+    int info;
+    // 入力データ
+//    double xa[] = {77.6E0, 114.9E0, 141.1E0, 190.8E0, 239.9E0, 289.0E0, 332.8E0, 378.4E0, 434.8E0, 477.3E0, 536.8E0,
+//                   593.1E0, 689.1E0, 760.0E0};
+//    double ya[] = {10.07E0, 14.73E0, 17.94E0, 23.93E0, 29.61E0, 35.18E0, 40.02E0, 44.82E0, 50.76E0, 55.05E0, 61.01E0,
+//                   66.40E0, 75.47E0, 81.78E0};
+
+    for (int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
+        VectorXd p(n); // beta1とbeta2の初期値(適当)
+//    p << 500.0, 0.0001;
+        p << 11.68, 0.0258, 0.8609, 0.2848;
+
+        double *xa;
+        double *ya;
+        xa = new double[_laneStepList[laneID].size()];
+        ya = new double[_laneStepList[laneID].size()];
+        int stepID = 0;
+        for (Step step: _laneStepList[laneID]) {
+            xa[stepID] = step._frame * (1.0/FPS);
+            xa[stepID] -= xa[0];
+            ya[stepID] = step._foot.x / 10.0;
+            stepID++;
+        }
+//        xa[0] = 0.0;
+        ya[0] = 0.0;
+
+        std::vector<double> x(&xa[0], &xa[stepID]); // vectorの初期化は不便
+        std::vector<double> y(&ya[0], &ya[stepID]);
+
+        misra1a_functor functor(n, x.size(), &x[0], &y[0]);
+        LevenbergMarquardt<misra1a_functor> lm(functor);
+        info = lm.minimize(p);
+
+
+
+        Gnuplot g1("test");
+        g1.set_title("test");
+        g1.set_style("lines").plot_xy(x, y); // 点列の描画
+
+        std::stringstream str;
+        str << "10*x";
+//        str << (p[0] + p[1]) << << "*(1.0-exp(-" << p[1] << "*x))";
+
+        g1.set_style("lines").plot_equation(str.str()); // 結果の描画
+
+        std::cout << p[0] << " " << p[1] << " " << p[2] << " " << p[3] << std::endl; // 学習結果
+        for(int t = 0; t < 10; t++){
+            cout << t << " " << ((p[0] + p[1])*t) - ((p[0]/p[2])*(1.0-exp(-p[2]*t))) + ((p[1]/p[3])*(1.0-exp(p[3]*t))) << " " << p[0]*(1.0-exp(-p[2]*t)) + p[1]*(1-exp(p[3]*t)) << endl;
+        }
+    }
+}
+
+
+
+
+
+
+
+    //トラッキング対象ランナーの
+    //１原画像での足位置,２パノラマスケールでの足位置,３俯瞰画像での足位置を保存
+//    getAllScaleFootPosition();
+//
+//    // 右足左足と直線の距離出力
+//    legLaneDist();
+//
+//    // 直線距離が近傍xフレームで最小になるフレームをチェック
+//    candidateStepFrame();
+//
+//    // 足が対象レーン内に存在するかどうか確認
+//        insideLane();
+//
+//    //設置候補点の左右統合
+//    mergeStepID();
+//
+//    //接地点の可視化
+//    visualizeSteps();
+//
+//    //ピッチを用いた補正
+//    pitchCompletion();
+//
+//    //歩幅を求める
+//    calculateStrideLength();
+//
+//    //歩幅の可視化
+//    visualizeStride();
+//
+//    //平均歩幅を用いた補正
+//    //averageCompletion();
+//
+//
+//
+//    //多項式近似による補正
+//    nDegreeApproximation Aproximate(4, this->stridePoints);
+
+
+
+
+//void Panorama::measuringStepPositions() {
 //
 //    //色ベクトル
 //    vector<cv::Scalar> colors;

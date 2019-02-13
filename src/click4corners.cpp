@@ -143,14 +143,18 @@ void Panorama::startFinishLineSelect() {
 
     }
 
-    float a, b;
+    float a, b, c, d;
     float lineNum = imList[0].grads.size();
     yagi::getGradSegment(startLineCornerPoints[0], startLineCornerPoints[1], &a, &b);
-//    yagi::getGradSegment(finishLineCornerPoints[0], finishLineCornerPoints[1], &c, &d);
+    yagi::getGradSegment(finishLineCornerPoints[0], finishLineCornerPoints[1], &c, &d);
     cv::Point pt1 = yagi::getCrossingPoint(a, b, imList[0].grads[0], imList[0].segments[0]);
     cv::Point pt2 = yagi::getCrossingPoint(a, b, imList[0].grads[lineNum - 1], imList[0].segments[lineNum - 1]);
+    cv::Point pt3 = yagi::getCrossingPoint(c, d, imList[this->finalLineImageNum].grads[0], imList[this->finalLineImageNum].segments[0]);
+    cv::Point pt4 = yagi::getCrossingPoint(c, d, imList[this->finalLineImageNum].grads[lineNum - 1], imList[this->finalLineImageNum].segments[lineNum - 1]);
     startLineCornerPoints[0] = pt1;
     startLineCornerPoints[1] = pt2;
+    finishLineCornerPoints[0] = pt3;
+    finishLineCornerPoints[1] = pt4;
 //    cv::Mat dummyIm = imList[0].image;
 //    cv::circle(dummyIm, pt1, 2, cv::Scalar(255,0,0), 2);
 //    cv::circle(dummyIm, pt2, 2, cv::Scalar(255,0,0), 2);

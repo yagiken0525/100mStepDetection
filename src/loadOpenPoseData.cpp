@@ -79,7 +79,7 @@ void Panorama::detectHumanArea() {
         }else{
             cv::Point2f pt(stof(coords[0]), stof(coords[1]));
             float conf = stof(coords[2]);
-            runner._body_parts_coord.push_back(pt);
+            runner.bodyPts.push_back(pt);
             runner._confidenceMap.push_back(conf);
         }
     }
@@ -114,7 +114,7 @@ void Panorama::detectHumanArea() {
 //            }
 //        } else {
 //            runner.setBodyCoord(coords);
-//            runner.mask_rect = getMaskRect(runner._body_parts_coord);
+//            runner.mask_rect = getMaskRect(runner.bodyPts);
 //            first_runner = false;
 //        }
 //
@@ -133,17 +133,17 @@ void Panorama::detectHumanArea() {
 
 void Panorama::OpenPoseBody::setBodyCoord(vector<string> coord) {
     cv::Point2f coord_f(stof(coord[0]), stof(coord[1]));
-    _body_parts_coord.push_back(coord_f);
+    bodyPts.push_back(coord_f);
 }
 
 
 vector<cv::Point2f> Panorama::OpenPoseBody::getBodyCoord() {
-    return this->_body_parts_coord;
+    return this->bodyPts;
 }
 
 
 void Panorama::OpenPoseBody::clearBodyCoord() {
-    _body_parts_coord.clear();
+    bodyPts.clear();
 }
 
 cv::Mat Panorama::calcOpenPoseMask(vector<cv::Point2f>& pts, cv::Size imSize){
@@ -225,7 +225,7 @@ void Panorama::getOpenPoseMask(){
         vector<OpenPoseBody>& ops = imList[imID].Runners;
         for(int opID = 0; opID < ops.size(); opID++){
             OpenPoseBody& hb = ops[opID];
-            cv::Mat openPoseMask = calcOpenPoseMask(hb._body_parts_coord, cv::Size(IMG_WIDTH, IMG_HEIGHT));
+            cv::Mat openPoseMask = calcOpenPoseMask(hb.bodyPts, cv::Size(IMG_WIDTH, IMG_HEIGHT));
             hb.openPoseMask = openPoseMask;
             cv::Mat roughMasked = yagi::maskAofB(imList[imID].image, hb.openPoseMask);
             hb.opMaskedImage = roughMasked;
@@ -272,7 +272,7 @@ void Panorama::getOpenPoseMask(){
             cv::Point2f lFoot(0,0);
             int lFootNum = 0;
 
-            for(cv::Point2f pt: hb._body_parts_coord) {
+            for(cv::Point2f pt: hb.bodyPts) {
                 //右足左足の重心を出す
                 if(pt != cv::Point2f(0,0)) {
                     if ((ptID == 19) || (ptID == 20) || (ptID == 21)) {
@@ -338,7 +338,7 @@ void Panorama::maskHumanArea() {
 //
 //        for (auto itr_runner = runnersInFrame.begin(); itr_runner != runnersInFrame.end(); ++itr_runner) {
 //            MaskArea area;
-//            area._mask_area = getMaskRect(itr_runner->_body_parts_coord);
+//            area._mask_area = getMaskRect(itr_runner->bodyPts);
 //            mask_in_frame.push_back(area);
 //        }
 
@@ -378,12 +378,12 @@ void Panorama::maskHumanArea() {
 }
 
 
-cv::Rect Panorama::getMaskRect(vector<cv::Point2f> &_body_parts_coord) {
+cv::Rect Panorama::getMaskRect(vector<cv::Point2f> &bodyPts) {
     int min_x = 10000;
     int max_x = 0;
     int min_y = 10000;
     int max_y = 0;
-    for (auto itr_coord = _body_parts_coord.begin(); itr_coord != _body_parts_coord.end(); ++itr_coord) {
+    for (auto itr_coord = bodyPts.begin(); itr_coord != bodyPts.end(); ++itr_coord) {
         int x = itr_coord->x;
         int y = itr_coord->y;
         if (min_x > x)
