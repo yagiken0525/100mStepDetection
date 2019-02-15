@@ -179,9 +179,6 @@ void Panorama::trackingRunner() {
         }
 
         if(SHOW_TRACKING_RUNNER) {
-            if (laneTrackingList[5][imID].bodyPts.size() != 0)
-                cv::circle(dummy, laneTrackingList[5][imID].bodyPts[0], 2, cv::Scalar(255, 0, 0), 2);
-
             cv::imshow("debug tracking", dummy);
             cv::waitKey();
         }
@@ -349,7 +346,6 @@ void Panorama::makePanorama(){
 
 void Panorama::estimateStepPoints(){
     getOverviewHomography();
-//    projectTrackLine();
     measuringStepPositions();
 }
 
@@ -602,9 +598,9 @@ void Panorama::generatePanorama() {
     cv::Mat smallsmall;
     cv::warpPerspective(this->smallPanoramaImage, smallsmall, resizeH, smallPanoramaImage.size());
 
-    cv::imshow("panorama", this->smallPanoramaImage);
-    cv::imshow("smallpanorama", smallsmall);
-    cv::waitKey();
+//    cv::imshow("panorama", this->smallPanoramaImage);
+//    cv::imshow("smallpanorama", smallsmall);
+//    cv::waitKey();
     cv::imwrite(_result_folder + "/panorama.jpg", this->smallPanoramaImage);
     cv::destroyAllWindows();
 
@@ -1713,17 +1709,17 @@ bool Panorama::checkMin(int imID, int laneID){
 }
 
 bool Panorama::checkInLaneLines(int imID, int personID){
-    int laneID = personID + 1;
+    int laneID = personID+1;
     ImageInfo im = imList[imID];
     float upperGrad = im.grads[laneID];
     float lowerGrad = im.grads[laneID + 1];
     float upperSegment = im.segments[laneID];
     float lowerSegment = im.segments[laneID + 1];
     cv::Point2f foot = _laneTrackingList[personID][imID].footInIm;
-    cv::circle(imList[imID].image, cv::Point2f(foot.x, upperGrad * foot.x + upperSegment), 2, cv::Scalar(255,0,0), 2);
+    cv::circle(imList[imID].image, cv::Point2f(foot.x, upperGrad * foot.x + upperSegment - 5), 2, cv::Scalar(255,0,0), 2);
     cv::circle(imList[imID].image, cv::Point2f(foot.x, lowerGrad * foot.x + lowerSegment), 2, cv::Scalar(0,0,255), 2);
 
-    return ((foot.y > (upperGrad * foot.x + upperSegment)) && (foot.y < (lowerGrad * foot.x + lowerSegment)));
+    return ((foot.y > (upperGrad * foot.x + upperSegment)-5) && (foot.y < (lowerGrad * foot.x + lowerSegment)));
 }
 
 
@@ -1747,16 +1743,22 @@ void Panorama::calcMeanStep(){
     for(int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
         vector<Step> *stepList =  &_laneStepList[laneID];
         vector<float> strideList;
+        vector<float> pitchList;
+
+        Step preStep;
+        int stepID = 0;
         for(Step step:*stepList){
-            strideList.push_back(step._stride);
+            if(stepID>0) {
+                strideList.push_back(step._foot.x - preStep._foot.x);
+                pitchList.push_back(step._frame - preStep._frame);
+            }
+            preStep = step;
+            stepID++;
         }
+
         sort(strideList.begin(), strideList.end());
         float meanStride = strideList[strideList.size()/2];
 
-        vector<float> pitchList;
-        for(Step step:*stepList){
-            pitchList.push_back(step._pitch);
-        }
         sort(pitchList.begin(), pitchList.end());
         float meanPitch = pitchList[pitchList.size()/2];
 
@@ -1787,12 +1789,6 @@ void Panorama::measuringStepPositions() {
                 mycalcWarpedPoint(footPt, &ovPoint,
                                   overView_H * resizeH * imList[imID].mulH);
                 op->footInOV = ovPoint[0];
-
-//                cv::circle(imList[imID].image, op->footInIm, 2, cv::Scalar(0,0,255), 2);
-//                cv::imshow("leg in image", imList[imID].image);
-//                cv::circle(overviewPanorama, op->footInOV, 2, colors[2], 2);
-//                cv::imshow("over", overviewPanorama);
-//                cv::waitKey();
             }
         }
     }
@@ -1801,25 +1797,27 @@ void Panorama::measuringStepPositions() {
     vector<cv::Point2f> neighborFramesLegs;
     for (int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
         Step preStep;
-        preStep._foot = cv::Point2f(-10, 0);
+        preStep._foot = cv::Point2f(0, 0);
         preStep._frame = -1;
         vector<Step> stepList;
         for (int imID = 0; imID < imList.size(); imID++) {
             //nフレームで最小か
             if (imID > STEP_JUDGE_RANGE / 2) {
-                cout << checkMin(imID, laneID) << " " << checkInLaneLines(imID, laneID) << endl;
+                cv::circle(imList[imID].image, _laneTrackingList[laneID][imID].footInIm, 2, cv::Scalar(0,255,0), 2);
+                cout << checkMin(imID, laneID) << " " << checkInLaneLines(imID, laneID) << " " << _laneTrackingList[laneID][imID].footInOV << _laneTrackingList[laneID][imID].footInIm << endl;
                 if (checkMin(imID, laneID) && checkInLaneLines(imID, laneID)) {
                     if (_laneTrackingList[laneID][imID].footInOV.x > preStep._foot.x) {
                         _laneTrackingList[laneID][imID].ifSteps = true;
                         Step newStep;
                         newStep._foot = _laneTrackingList[laneID][imID].footInOV;
                         newStep._frame = imID;
-                        if (preStep._frame > 0) {
-                            newStep._pitch = newStep._frame - preStep._frame;
-                            newStep._stride = newStep._foot.x - preStep._foot.x;
-                        }
+                        newStep._time = imID*(1.0/FPS);
+//                        if (preStep._frame > 0) {
+//                            newStep._pitch = newStep._frame - preStep._frame;
+//                            newStep._stride = newStep._foot.x - preStep._foot.x;
+//                        }
                         stepList.push_back(newStep);
-//                        cv::circle(overviewPanorama, _laneTrackingList[laneID][imID].footInOV, 2, cv::Scalar(0,0,255), 2);
+                        cv::circle(overviewPanorama, _laneTrackingList[laneID][imID].footInOV, 2, cv::Scalar(0,0,255), 2);
                         preStep = newStep;
                     }
                 }
@@ -1830,62 +1828,225 @@ void Panorama::measuringStepPositions() {
         }
         _laneStepList.push_back(stepList);
     }
-//    cv::waitKey(0);
     calcMeanStep();
 
+    //接地点可視化
+    float laneWidth = 50;
+    cv::Mat stepVisualization = cv::Mat::zeros(_laneTrackingList.size()*laneWidth, 1000,CV_8UC3);
+    for(int laneID = 0; laneID <= this->_laneTrackingList.size(); laneID++) {
+        cout << "laneID: " << laneID << endl;
+        float laneY = laneID * laneWidth;
+        cv::line(stepVisualization, cv::Point2f(0, laneY), cv::Point2f(1000, laneY), cv::Scalar(255, 255, 255), 2);
+    }
+
+    for(int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
+        vector<Step> *stepList = &_laneStepList[laneID];
+        float stepY = laneID*laneWidth + laneWidth/2;
+        for(Step step: *stepList){
+            cv::circle(stepVisualization, cv::Point2f(step._foot.x, stepY), 3, cv::Scalar(0,255,0), 1, 4);
+        }
+
+    }
+    cv::imshow("step", stepVisualization);
+    cv::waitKey();
+
+    //速度可視化
     //ピッチを元に誤った点を削除
-//    for(int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
-//        vector<Step> *stepList = &_laneStepList[laneID];
-//        Step meanStep = meanStepList[laneID];
-//        for (int stepID = 0; stepID < stepList->size(); stepID++) {
-//            cout << stepList->size() << endl;
-//            Step step = stepList->at(stepID);
-//            //TODO f_stride() + f_pitch
-//            cv::circle(overviewPanorama, step._foot, 2, cv::Scalar(0, 0, 255), 2);
-//
-//            if (abs(step._pitch - meanStep._pitch) >= 2) {
-//                cv::circle(overviewPanorama, step._foot, 2, cv::Scalar(0, 255, 0), 2);
-//                stepList->erase(stepList->begin() + stepID);
-//                if(stepList->size() != stepID) {
-////                    stepList->at(stepID)._pitch += step._pitch;
-////                    stepList->at(stepID)._stride += step._stride;
-//                    stepID--;
-//                }
-//            }
-//            cv::imshow("stepPt", overviewPanorama);
-//            cv::waitKey(0);
-//        }
-//    }
+    for(int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
+        vector<Step> *stepList = &_laneStepList[laneID];
+        Step meanStep = meanStepList[laneID];
+        for (int stepID = 1; stepID < stepList->size(); stepID++) {
+            Step step = stepList->at(stepID);
+            Step prestep = stepList->at(stepID-1);
+            cv::circle(overviewPanorama, step._foot, 2, cv::Scalar(0, 0, 255), 2);
 
-//    //10m毎の速度
-//    for (int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
-//        vector<Step> stepList = _laneStepList[laneID];
-//        for(int stepID = 1; stepID < stepList.size(); stepID++){
-//            if((stepList[stepID]._foot.x/100.0 - stepList[stepID - 1]._foot.x/100.0) == 1){
-//
-//            }
-//        }
-//    }
-
-    for (int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
-        vector<Step> stepList = _laneStepList[laneID];
-        vector<vector<Step>> speedEvery10m(10);
-        float predist = 0;
-        float pretime = 0;
-        for(Step step:stepList){
-            float time = step._frame * (1.0/FPS);
-            float dist = step._foot.x/10;
-            float speed = (dist - predist)/(time - pretime);
-            cout << dist << " " << time << " " << speed << " " <<  "pitchnoise: " << step._pitch - meanStepList[laneID]._pitch << endl;
-            predist = dist;
-            pretime = time;
-            if(speed>0){
-                if(dist < 100) {
-                    speedEvery10m[int(dist / 10)].push_back(step);
+            if ((step._frame - prestep._frame) - meanStep._pitch < -2) {
+                cv::circle(overviewPanorama, step._foot, 2, cv::Scalar(0, 255, 0), 2);
+                stepList->erase(stepList->begin() + stepID);
+                if(stepList->size() != stepID) {
+//                    stepList->at(stepID)._pitch += step._pitch;
+//                    stepList->at(stepID)._stride += step._stride;
+                    stepID--;
                 }
             }
-//            cout << "pitchnoise: " << step._pitch - meanStepList[laneID]._pitch << endl;
+//            cv::imshow("stepPt", overviewPanorama);
+//            cv::waitKey(0);
         }
+    }
+
+    //接地点可視化
+    laneWidth = 50;
+    stepVisualization = cv::Mat::zeros(_laneTrackingList.size()*laneWidth, 1000,CV_8UC3);
+    for(int laneID = 0; laneID <= this->_laneTrackingList.size(); laneID++) {
+        cout << "laneID: " << laneID << endl;
+        float laneY = laneID * laneWidth;
+        cv::line(stepVisualization, cv::Point2f(0, laneY), cv::Point2f(1000, laneY), cv::Scalar(255, 255, 255), 2);
+    }
+
+    for(int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
+        vector<Step> *stepList = &_laneStepList[laneID];
+        float stepY = laneID*laneWidth + laneWidth/2;
+        for(Step step: *stepList){
+            cv::circle(stepVisualization, cv::Point2f(step._foot.x, stepY), 3, cv::Scalar(0,255,0), 1, 4);
+        }
+
+    }
+    cv::imshow("step", stepVisualization);
+    cv::waitKey();
+
+    for(int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
+        vector<Step> *stepList = &_laneStepList[laneID];
+        cout << "laneID: " << laneID << endl;
+        for(Step step: *stepList){
+            cout << step._frame << " " << step._foot << " " << step._time << endl;
+        }
+    }
+
+//    //ピッチを元に点を追加
+//    for(int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
+//        vector<Step> *stepList = &this->_laneStepList[laneID];
+//        Step meanStep = meanStepList[laneID];
+//        for (int stepID = 0; stepID < stepList->size(); stepID++) {
+//            Step step = stepList->at(stepID);
+////            cv::circle(overviewPanorama, step._foot, 2, cv::Scalar(255, 255, 0), 2);
+////            cv::imshow("stepPt", overviewPanorama);
+////            cv::waitKey(0);
+////            cout << step._pitch - meanStep._pitch << endl;
+//            if (step._pitch - meanStep._pitch >= 2) {
+//                if (stepID > 0) {
+//                    Step newStep;
+//                    newStep._foot = cv::Point2f((stepList->at(stepID - 1)._foot + stepList->at(stepID)._foot) / 2);
+//                    newStep._stride = newStep._foot.x - stepList->at(stepID - 1)._foot.x;
+//                    newStep._frame = (stepList->at(stepID - 1)._frame + stepList->at(stepID)._frame) / 2;
+//                    newStep._pitch = newStep._frame - stepList->at(stepID - 1)._frame;
+//                    stepList->at(stepID)._stride = step._foot.x - newStep._foot.x;
+//                    stepList->at(stepID)._pitch = step._frame - newStep._frame;
+//                    cv::circle(overviewPanorama, newStep._foot, 2, cv::Scalar(255, 0, 0), 2);
+//                    stepList->insert(stepList->begin() + stepID, newStep);
+//                }
+////                cv::imshow("stepPt", overviewPanorama);
+////                cv::waitKey(0);
+//            }
+//        }
+//    }
+
+    //    //10m毎の速度を求める
+    for (int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
+        string speedFolder = _txt_folder + "/speed/";
+        myMkdir(speedFolder);
+        ofstream ofs(speedFolder + "/10mspeed_lane" + to_string(laneID) + ".txt");
+        vector<Step> stepList = _laneStepList[laneID];
+        vector<float> speedList(10,0.0);
+        float preT = 0.0;
+        float preD = 0.0;
+        int stepNumWithIn10m = 0;
+        cout << laneID << endl;
+        for(int stepID = 1; stepID < stepList.size(); stepID++){
+            stepNumWithIn10m++;
+            cout <<" : x= " << stepList[stepID-1]._foot.x/10.0 << " to " << stepList[stepID]._foot.x/10.0 ;
+            cout <<" : t= " << stepList[stepID-1]._time << " to " << stepList[stepID]._time ;
+            cout <<" : dm= " <<((stepList[stepID]._foot.x - stepList[stepID-1]._foot.x)/10.0);
+            cout <<" : dt= " << (stepList[stepID]._time - stepList[stepID-1]._time);
+            cout <<" : v= " << ((stepList[stepID]._foot.x - stepList[stepID-1]._foot.x)/10.0)/(stepList[stepID]._time - stepList[stepID-1]._time) << endl;
+             if((int(stepList[stepID]._foot.x/100) - int(stepList[stepID - 1]._foot.x/100)) == 1){
+                if(stepNumWithIn10m > 0){ //最低その区間に3点は存在{
+
+                    //ボーダーの速度は線形補間する
+                    float t1 = stepList[stepID - 1]._time - preT;
+                    float t2 = stepList[stepID]._time - preT;
+                    float d1 = float((stepList[stepID - 1]._foot.x / 10.0) - preD);
+                    float d2 = float((stepList[stepID]._foot.x / 10.0) - preD);
+                    float v1 = d1 / t1;
+                    float v2 = d2 / t2;
+                    preD += 10.0;
+                    float weight = abs(d2 - 10) / (abs(d1 - 10) + abs(d2 - 10));
+                    float tenMV = (v1 * weight + v2 * (1 - weight));
+                    float tenMT = (t1 * weight + t2 * (1 - weight));
+                    cout << "x= " << preD << " :v=  " << tenMV << " :t= " <<  preT + tenMT << " :dt= " << tenMT <<" :mV= " << 10.0/tenMT << endl;
+                    preT += tenMT;
+                    stepNumWithIn10m = 0;
+                    speedList[int(stepList[stepID-1]._foot.x/100.0)] = tenMV;
+                }else{
+                    stepNumWithIn10m = 0;
+                    preD += 10.0;
+                }
+            }else
+        }
+        _lane10mSpeedList.push_back(speedList);
+
+        ofs << to_string(0) << " " << 0.0 << endl;
+        for(int i = 0; i < 10; i++){
+            ofs << to_string((i+1)*10) << " " << speedList[i] << endl;
+        }
+        ofs.close();
+    }
+
+    //走行位置と時刻でモデルに当てはめ
+    //スタートとゴールを追加
+    ifstream ifs(_txt_folder + "/goaltime.txt");
+    std::string str;
+    int lineID = 0;
+    while(getline(ifs,str))
+    {
+        Step startStep;
+        startStep._time = 0;
+        startStep._foot = cv::Point2f(0,0);
+        _laneStepList[lineID].insert( _laneStepList[lineID].begin(), startStep);
+
+        vector<string> words = split(str, ' ');
+        Step goalStep;
+        goalStep._time = stof(words[1]);       //ゴールタイム
+        goalStep._foot = cv::Point2f(1000,0);  //ゴール地点
+        _laneStepList[lineID].push_back(goalStep);
+        lineID++;
+    }
+
+    //ground truthをロード
+    string filename = _txt_folder + "groundTruth/00.txt";
+    if(checkFileExistence(filename)) {
+        for(int i = 0; i < _laneStepList.size(); i++) {
+            vector<Step> groundTruthList;
+            ifstream ifs(_txt_folder + "groundTruth/0" + to_string(i) + ".txt");
+            std::string str;
+            int meter = 10;
+            Step step;
+            step._time = 0.0;
+            step._foot = cv::Point2f(0,0);
+            groundTruthList.push_back(step);
+            while (getline(ifs, str)) {
+                vector<string> words = split(str, ' ');
+                Step step;
+                step._time = stof(words[0]);
+                step._foot = cv::Point2f(meter, 0);
+                groundTruthList.push_back(step);
+                meter+=10;
+            }
+            _groundTruthList.push_back(groundTruthList);
+        }
+    }
+
+    correctSteps();
+
+//
+//    for (int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
+//        vector<Step> stepList = _laneStepList[laneID];
+//        vector<vector<Step>> stepEvery10m(10);
+//        float predist = 0;
+//        float pretime = 0;
+//        for(Step step:stepList){
+//            float time = step._frame * (1.0/FPS);
+//            float dist = step._foot.x/10;
+//            float speed = (dist - predist)/(time - pretime);
+//            cout << dist << " " << time << " " << speed << " " <<  "pitchnoise: " << step._pitch - meanStepList[laneID]._pitch << endl;
+//            predist = dist;
+//            pretime = time;
+//            if(speed>0){
+//                if(dist < 100) {
+//                    stepEvery10m[int(dist / 10)].push_back(step);
+//                }
+//            }
+////            cout << "pitchnoise: " << step._pitch - meanStepList[laneID]._pitch << endl;
+//        }
 
 //        int speedListID = 0;
 //        for(vector<Step> speedList: speedEvery10m){
@@ -1900,35 +2061,9 @@ void Panorama::measuringStepPositions() {
 //                meanSpeed+=(step._stride/(step._pitch*(1.0/FPS)))*(step._stride/sumOfPitchNoise);
 //            }
 //        }
-    }
-
-
-
-//    for(int stepID = 0; stepID < stepList->size(); stepID++){
-//        Step step = stepList->at(stepID);
-//        cv::circle(overviewPanorama, step._foot, 2, cv::Scalar(255, 255, 0), 2);
-//        cv::imshow("stepPt", overviewPanorama);
-//        cv::waitKey(0);
-//        cout << step._pitch - meanStep._pitch << endl;
-//        if(step._pitch - meanStep._pitch >= 2){
-//            if(stepID > 0) {
-//                Step newStep;
-//                newStep._foot = cv::Point2f((stepList->at(stepID - 1)._foot + stepList->at(stepID)._foot) / 2);
-//                newStep._stride = newStep._foot.x - stepList->at(stepID - 1)._foot.x;
-//                newStep._frame = (stepList->at(stepID - 1)._frame + stepList->at(stepID)._frame) / 2;
-//                newStep._pitch = newStep._frame - stepList->at(stepID - 1)._frame;
-//                stepList->at(stepID)._stride = step._foot.x - newStep._foot.x;
-//                stepList->at(stepID)._pitch = step._frame - newStep._frame;
-//                cv::circle(overviewPanorama, newStep._foot, 2, cv::Scalar(255, 0, 0), 2);
-//                stepList->insert(stepList->begin() + stepID, newStep);
-//            }
-//            cv::imshow("stepPt", overviewPanorama);
-//            cv::waitKey(0);
-//        }
 //    }
 
-    //接地補正
-    correctSteps();
+
 }
 
 struct misra1a_functor
@@ -1943,8 +2078,8 @@ struct misra1a_functor
     int operator()(const Eigen::VectorXd& b, Eigen::VectorXd& fvec) const
     {
         for (int i = 0; i < values_; ++i) {
-//            fvec[i] = b[0]*(1.0 - exp(-b[1]*x[i])) - y[i] ;
-            fvec[i] = pow((((b[0] + b[1])*x[i]) - ((b[0]/b[2])*(1.0-exp(-b[2]*x[i]))) + ((b[1]/b[3])*(1.0-exp(b[3]*x[i]))) - y[i]),1);
+//            fvec[i] = pow((((b[0] + b[1])*x[i]) - ((b[0]/b[2])*(1.0-exp(-b[2]*x[i]))) + ((b[1]/b[3])*(1.0-exp(b[3]*x[i]))) - y[i]),1);
+            fvec[i] = pow(b[0]*(1-exp(-b[2]*x[i])) + b[1]*(1-exp(b[3]*x[i])) - y[i], 1);
         }
         return 0;
     }
@@ -1954,10 +2089,14 @@ struct misra1a_functor
         for (int i = 0; i < values_; ++i) {
 //            fjac(i, 0) = (1.0 - exp(-b[1]*x[i]));
 //            fjac(i, 1) = (b[0]*x[i] * exp(-b[1]*x[i]));
-            fjac(i, 0) = exp(-b[2]*x[i]) * ((b[2]*x[i] - 1.0)*exp(b[2]*x[i]) + 1.0) / b[2];
-            fjac(i, 1) = -(exp(b[3]*x[i]) - b[3]*x[i] - 1.0)/b[3];
-            fjac(i, 2) = exp(-b[2]*x[i])*(b[0]*exp(b[2]*x[i]) - b[0]*b[2]*x[i] - b[0])/(b[2]*b[2]);
-            fjac(i, 3) = -(((b[1]*b[3]*x[i] - b[1])*exp(b[3]*x[i])) + b[1])/(b[3]*b[3]);
+//            fjac(i, 0) = exp(-b[2]*x[i]) * ((b[2]*x[i] - 1.0)*exp(b[2]*x[i]) + 1.0) / b[2];
+//            fjac(i, 1) = -(exp(b[3]*x[i]) - b[3]*x[i] - 1.0)/b[3];
+//            fjac(i, 2) = exp(-b[2]*x[i])*(b[0]*exp(b[2]*x[i]) - b[0]*b[2]*x[i] - b[0])/(b[2]*b[2]);
+//            fjac(i, 3) = -(((b[1]*b[3]*x[i] - b[1])*exp(b[3]*x[i])) + b[1])/(b[3]*b[3]);
+            fjac(i, 0) = exp(-b[2]*x[i]) * (exp(b[2]*x[i]) - 1.0);
+            fjac(i, 1) = 1-exp(b[3]*x[i]);
+            fjac(i, 2) = b[0]*x[i]*exp(-b[2]*x[i]);
+            fjac(i, 3) = -b[1]*x[i]*exp(b[3]*x[i]);
         }
         return 0;
     }
@@ -1968,58 +2107,186 @@ struct misra1a_functor
     int values() const { return values_; }
 };
 
+//
+//void Panorama::correctSteps() {
+//    const int n = 4; // 未知数の数
+//    int info;
+//
+//    string folder = _txt_folder + "/modeling_results/";
+//    myMkdir(folder);
+//
+//    for (int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
+//
+//        ofstream ofs(folder + "/lane" + to_string(laneID) + ".txt");
+//        VectorXd p(n); // beta1とbeqta2の初期値(適当)
+//        p << 11.68, 0.0258, 0.8609, 0.2848;
+//
+//        double *xa;
+//        double *ya;
+//
+//        //全ての点を使うバージョン
+//        xa = new double[_laneStepList[laneID].size()];
+//        ya = new double[_laneStepList[laneID].size()];
+//        int stepID = 0;
+//        for (Step step: _laneStepList[laneID]) {
+//            if(stepID == _laneStepList[laneID].size())
+//                break;
+//            xa[stepID] = step._time;
+//            ya[stepID] = step._foot.x / 10.0;
+//            stepID++;
+//        }
+//
+//        std::vector<double> x(&xa[0], &xa[stepID]); // vectorの初期化は不便
+//        std::vector<double> y(&ya[0], &ya[stepID]);
+//
+//        //4点だけ使うバージョン
+////        int ptsize = 4;
+////        xa = new double[ptsize];
+////        ya = new double[ptsize];
+////        xa[0] = _laneStepList[laneID][0]._time;
+////        ya[0] = _laneStepList[laneID][0]._foot.x / 10.0;
+////        xa[1] = _laneStepList[laneID][3]._time;
+////        ya[1] = _laneStepList[laneID][3]._foot.x / 10.0;
+////        xa[2] = _laneStepList[laneID][20]._time;
+////        ya[2] = _laneStepList[laneID][20]._foot.x / 10.0;
+////        xa[3] = _laneStepList[laneID][_laneStepList[laneID].size()-1]._time;
+////        ya[3] = _laneStepList[laneID][_laneStepList[laneID].size()-1]._foot.x / 10.0;
+////
+////        std::vector<double> x(&xa[0], &xa[ptsize]); // vectorの初期化は不便
+////        std::vector<double> y(&ya[0], &ya[ptsize]);
+//
+//        //速度のground truth
+//        double *gtx;
+//        double *gty;
+//        gtx = new double[11];
+//        gty = new double[11];
+//        for(int i = 0; i<=10; i++){
+//            gtx[i] = i*10;
+//            gty[i] = 10/(_groundTruthList[laneID][i]._time);
+//        }
+//        std::vector<double> gta(&gtx[0], &gtx[11]); // vectorの初期化は不便
+//        std::vector<double> gtb(&gty[0], &gty[11]);
+//
+//        misra1a_functor functor(n, x.size(), &x[0], &y[0]);
+//        LevenbergMarquardt<misra1a_functor> lm(functor);
+//        info = lm.minimize(p);
+//
+//        Gnuplot g1("test");
+//        g1.set_title("test");
+//        g1.set_style("points").plot_xy(x, y); // 点列の描画
+////        g1.set_style("points").plot_xy(gta, gtb); // 点列の描画
+//
+//        std::stringstream str;
+//        std::stringstream str2;
+//        str << p[0] << "*(1.0-exp(-" << p[2] << "*x))+" << p[1] << "*(1-exp(" << p[3] << "*x))";
+//        str2 << "((" << p[0] << "+" << p[1] << ")*x) - ((" << p[0] << "/" << p[2] << ")*(1.0-exp(-" << p[2] << "*x)))+((" << p[1] << "/" << p[3] << ")*(1.0-exp(" << p[3] << "*x)))";
+//        g1.set_style("lines").plot_equation(str.str()); // 結果の描画
+//        g1.set_style("lines").plot_equation(str2.str()); // 結果の描画
+//        std::cout << p[0] << " " << p[1] << " " << p[2] << " " << p[3] << std::endl; // 学習結果
+//
+//
+//        ofs << "Time Speed Position" << endl;
+//        float goaltime = _laneStepList[laneID][_laneStepList[laneID].size()-1]._time;
+//        for(int t = 0; t < 15; t++){
+//            if(t > _laneStepList[laneID][_laneStepList[laneID].size()-1]._time){ // ゴールタイム超えたら
+//                float goalspeed = p[0]*(1.0-exp(-p[2]*goaltime)) + p[1]*(1-exp(p[3]*goaltime));
+//                ofs << goaltime << " " <<  goalspeed << " " << 100.0 << endl;
+//                break;
+//            }
+//            float time = t;
+//            float speed = p[0]*(1.0-exp(-p[2]*t)) + p[1]*(1-exp(p[3]*t));
+//            float position = ((p[0] + p[1])*t) - ((p[0]/p[2])*(1.0-exp(-p[2]*t))) + ((p[1]/p[3])*(1.0-exp(p[3]*t)));
+//            ofs << time << " " << speed << " " << position << endl;
+//        }
+//    }
+//}
+
+
 
 void Panorama::correctSteps() {
-
     const int n = 4; // 未知数の数
     int info;
-    // 入力データ
-//    double xa[] = {77.6E0, 114.9E0, 141.1E0, 190.8E0, 239.9E0, 289.0E0, 332.8E0, 378.4E0, 434.8E0, 477.3E0, 536.8E0,
-//                   593.1E0, 689.1E0, 760.0E0};
-//    double ya[] = {10.07E0, 14.73E0, 17.94E0, 23.93E0, 29.61E0, 35.18E0, 40.02E0, 44.82E0, 50.76E0, 55.05E0, 61.01E0,
-//                   66.40E0, 75.47E0, 81.78E0};
+
+    string folder = _txt_folder + "/modeling_results/";
+    myMkdir(folder);
 
     for (int laneID = 0; laneID < this->_laneTrackingList.size(); laneID++) {
-        VectorXd p(n); // beta1とbeta2の初期値(適当)
-//    p << 500.0, 0.0001;
+
+        ofstream ofs(folder + "/lane" + to_string(laneID) + ".txt");
+        VectorXd p(n); // beta1とbeqta2の初期値(適当)
         p << 11.68, 0.0258, 0.8609, 0.2848;
 
-        double *xa;
-        double *ya;
-        xa = new double[_laneStepList[laneID].size()];
-        ya = new double[_laneStepList[laneID].size()];
-        int stepID = 0;
-        for (Step step: _laneStepList[laneID]) {
-            xa[stepID] = step._frame * (1.0/FPS);
-            xa[stepID] -= xa[0];
-            ya[stepID] = step._foot.x / 10.0;
-            stepID++;
-        }
-//        xa[0] = 0.0;
-        ya[0] = 0.0;
 
-        std::vector<double> x(&xa[0], &xa[stepID]); // vectorの初期化は不便
-        std::vector<double> y(&ya[0], &ya[stepID]);
+        //全ての点を使うバージョン
+        std::vector<double> x;
+        std::vector<double> y;
+        int speedID = 0;
+        for (float speed: _lane10mSpeedList[laneID]) {
+            if(speed != 0) {
+                x.push_back(speedID*10);
+                y.push_back(double(speed));
+            }
+            speedID++;
+        }
+
+        //4点だけ使うバージョン
+//        int ptsize = 4;
+//        xa = new double[ptsize];
+//        ya = new double[ptsize];
+//        xa[0] = _laneStepList[laneID][0]._time;
+//        ya[0] = _laneStepList[laneID][0]._foot.x / 10.0;
+//        xa[1] = _laneStepList[laneID][3]._time;
+//        ya[1] = _laneStepList[laneID][3]._foot.x / 10.0;
+//        xa[2] = _laneStepList[laneID][20]._time;
+//        ya[2] = _laneStepList[laneID][20]._foot.x / 10.0;
+//        xa[3] = _laneStepList[laneID][_laneStepList[laneID].size()-1]._time;
+//        ya[3] = _laneStepList[laneID][_laneStepList[laneID].size()-1]._foot.x / 10.0;
+//
+//        std::vector<double> x(&xa[0], &xa[ptsize]); // vectorの初期化は不便
+//        std::vector<double> y(&ya[0], &ya[ptsize]);
+
+        //速度のground truth
+//        double *gtx;
+//        double *gty;
+//        gtx = new double[11];
+//        gty = new double[11];
+//        for(int i = 0; i<=10; i++){
+//            gtx[i] = i*10;
+//            gty[i] = 10/(_groundTruthList[laneID][i]._time);
+//        }
+//        std::vector<double> gta(&gtx[0], &gtx[11]); // vectorの初期化は不便
+//        std::vector<double> gtb(&gty[0], &gty[11]);
 
         misra1a_functor functor(n, x.size(), &x[0], &y[0]);
         LevenbergMarquardt<misra1a_functor> lm(functor);
         info = lm.minimize(p);
 
-
-
         Gnuplot g1("test");
         g1.set_title("test");
-        g1.set_style("lines").plot_xy(x, y); // 点列の描画
+        g1.set_style("points").plot_xy(x, y); // 点列の描画
+//        g1.set_style("points").plot_xy(gta, gtb); // 点列の描画
 
         std::stringstream str;
-        str << "10*x";
-//        str << (p[0] + p[1]) << << "*(1.0-exp(-" << p[1] << "*x))";
-
+        std::stringstream str2;
+        str << p[0] << "*(1.0-exp(-" << p[2] << "*x))+" << p[1] << "*(1-exp(" << p[3] << "*x))";
+//        str2 << "((" << p[0] << "+" << p[1] << ")*x) - ((" << p[0] << "/" << p[2] << ")*(1.0-exp(-" << p[2] << "*x)))+((" << p[1] << "/" << p[3] << ")*(1.0-exp(" << p[3] << "*x)))";
         g1.set_style("lines").plot_equation(str.str()); // 結果の描画
-
+//        g1.set_style("lines").plot_equation(str2.str()); // 結果の描画
         std::cout << p[0] << " " << p[1] << " " << p[2] << " " << p[3] << std::endl; // 学習結果
+
+
+        ofs << "Time Speed Position" << endl;
+        float goaltime = _laneStepList[laneID][_laneStepList[laneID].size()-1]._time;
         for(int t = 0; t < 10; t++){
-            cout << t << " " << ((p[0] + p[1])*t) - ((p[0]/p[2])*(1.0-exp(-p[2]*t))) + ((p[1]/p[3])*(1.0-exp(p[3]*t))) << " " << p[0]*(1.0-exp(-p[2]*t)) + p[1]*(1-exp(p[3]*t)) << endl;
+//            if(t > _laneStepList[laneID][_laneStepList[laneID].size()-1]._time){ // ゴールタイム超えたら
+//                float goalspeed = p[0]*(1.0-exp(-p[2]*goaltime)) + p[1]*(1-exp(p[3]*goaltime));
+//                ofs << goaltime << " " <<  goalspeed << " " << 100.0 << endl;
+//                break;
+//            }
+            float time = t;
+            float speed = p[0]*(1.0-exp(-p[2]*t)) + p[1]*(1-exp(p[3]*t));
+            float position = ((p[0] + p[1])*t) - ((p[0]/p[2])*(1.0-exp(-p[2]*t))) + ((p[1]/p[3])*(1.0-exp(p[3]*t)));
+            ofs << time << " " << speed << " " << position << endl;
         }
     }
 }

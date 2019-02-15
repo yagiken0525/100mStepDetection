@@ -230,10 +230,14 @@ namespace yagi {
             float _frame;
             float _pitch;
             float _stride;
+            float _time;
         };
+
         std::vector<Step> meanStepList;
         std::vector<std::vector<OpenPoseBody>> _laneTrackingList;
         std::vector<std::vector<Step>> _laneStepList;
+        std::vector<std::vector<Step>> _groundTruthList;
+        std::vector<std::vector<float>> _lane10mSpeedList;
 
 
 
